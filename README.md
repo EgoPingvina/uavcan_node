@@ -20,5 +20,5 @@ go to libuavcan parent folder
 
 invoke 
 ```
-libuavcan/libuavcan/dsdl_compiler/libuavcan_dsdlc /cygdrive/*path to parent folder*/libuavcan/dsdl/uavcan -Olibuavcan/libuavcan/include/dsdlc_g -vvv
+libuavcan/libuavcan/dsdl_compiler/libuavcan_dsdlc /cygdrive/*path to parent folder*/libuavcan/dsdl/uavcan -Odsdlc_g -vvv
 ```
