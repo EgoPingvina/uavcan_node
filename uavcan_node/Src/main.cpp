@@ -2,6 +2,9 @@
 #include "uavcan_node.hpp"
 #include "NumericConvertions.hpp"
 
+/// <summary>
+/// Delay to initialize pwm motor controller
+/// </summary>
 const uint32_t START_DELAY_MS = 5000;
 
 CAN_HandleTypeDef hcan;
@@ -214,21 +217,19 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 	
+	// it needs for ESC controller
+	HAL_Delay(START_DELAY_MS);
+
 	/* Infinite loop */
 	while (1)
 	{
 		uavcan_node::NodeSpin();
 
-		if (HAL_GetTick() < START_DELAY_MS)
-			continue;
-
 		int value = 0;
 		if (uavcan_node::getIntRaw(&value))
-		{
 			TIM3->CCR2 = TIM3->CCR1 =
 				value < 1
 				? 900
 				: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);
-		}
 	}
 }
