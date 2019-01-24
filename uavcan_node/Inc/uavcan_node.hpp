@@ -2,10 +2,15 @@
 
 #include <uavcan_stm32/uavcan_stm32.hpp>
 
-namespace uavcan_node {
-
+namespace uavcan_node
+{
 	int configureNode();	
 
+	/// <summary>
+	/// Spinning for n second.
+	/// The method spin() may return earlier if an error occurs(e.g.driver failure).
+	/// All error codes are listed in the header uavcan / error.hpp.
+	/// </summary>
 	int NodeSpin(); 
 
 	int NodeStartPub();

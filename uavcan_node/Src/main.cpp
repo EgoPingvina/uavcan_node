@@ -1,11 +1,23 @@
-#include "NumericConvertions.hpp"
 #include "main.hpp"
+#include "uavcan_node.hpp"
+#include "NumericConvertions.hpp"
+
+const uint32_t START_DELAY_MS = 5000;
 
 CAN_HandleTypeDef hcan;
 
 TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart2;
+
+void ErrorHandler(char * file, int line)
+{
+	// ToDo make a notification about error
+	while (true)
+	{
+
+	}
+}
 
 /// <summary>
 /// System Clock Configuration
@@ -19,7 +31,7 @@ void SystemClock_Config(void)
 	*/
 	RCC_OscInitStruct.OscillatorType		= RCC_OSCILLATORTYPE_HSI;
 	RCC_OscInitStruct.HSIState				= RCC_HSI_ON;
-	RCC_OscInitStruct.HSICalibrationValue	= RCC_HSICALIBRATION_DEFAULT;
+	RCC_OscInitStruct.HSICalibrationValue	= 16; // ToDo разобраться, почему не RCC_HSICALIBRATION_DEFAULT
 	RCC_OscInitStruct.PLL.PLLState			= RCC_PLL_ON;
 	RCC_OscInitStruct.PLL.PLLSource			= RCC_PLLSOURCE_HSI_DIV2;
 	RCC_OscInitStruct.PLL.PLLMUL			= RCC_PLL_MUL16;
@@ -61,6 +73,31 @@ static void MX_CAN_Init(void)
 		Error_Handler();
 }
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
+{
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+	if (htim->Instance == TIM3)
+	{
+
+		/* TIM3 GPIO Configuration
+		 * PA6     ------> TIM3_CH1
+		 */
+		GPIO_InitStruct.Pin = GPIO_PIN_6;
+		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+		/* TIM3 GPIO Configuration
+		 * PA7     ------> TIM3_CH2
+		 */
+		GPIO_InitStruct.Pin = GPIO_PIN_7;
+		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	}
+}
+
 /// <summary>
 /// TIM3 Initialization Function
 /// </summary>
@@ -86,11 +123,14 @@ static void MX_TIM3_Init(void)
 		Error_Handler();
 	  
 	sConfigOC.OCMode					= TIM_OCMODE_PWM1;
-	sConfigOC.Pulse						= 1000;
+	sConfigOC.Pulse						= 0;
 	sConfigOC.OCPolarity				= TIM_OCPOLARITY_HIGH;
 	sConfigOC.OCFastMode				= TIM_OCFAST_DISABLE;
 	  
 	if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+		Error_Handler();
+
+	if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
 		Error_Handler();
 	    
 	HAL_TIM_MspPostInit(&htim3);
@@ -136,17 +176,6 @@ static void MX_GPIO_Init(void)
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
-/// <summary>
-/// This function is executed in case of error occurrence.
-/// </summary>
-void Error_Handler(void)
-{
-	/* USER CODE BEGIN Error_Handler_Debug */
-	/* User can add his own implementation to report the HAL error return state */
-
-	/* USER CODE END Error_Handler_Debug */
-}
-
 #ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
@@ -177,10 +206,29 @@ int main(void)
 	MX_CAN_Init();
 	MX_TIM3_Init();
 	MX_USART2_UART_Init();
+
+	uavcan_node::configureNode();
+	uavcan_node::NodeStartSub();
+	uavcan_node::NodeStartPub();
+
+	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 	
 	/* Infinite loop */
 	while (1)
 	{
+		uavcan_node::NodeSpin();
 
+		if (HAL_GetTick() < START_DELAY_MS)
+			continue;
+
+		int value = 0;
+		if (uavcan_node::getIntRaw(&value))
+		{
+			TIM3->CCR2 = TIM3->CCR1 =
+				value < 1
+				? 900
+				: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);
+		}
 	}
 }

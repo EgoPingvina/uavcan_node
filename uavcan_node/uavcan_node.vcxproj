@@ -41,16 +41,16 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Inc;Drivers\CMSIS\Device\ST\STM32F1xx\Include;Drivers\STM32F1xx_HAL_Driver\Inc;Drivers\STM32F1xx_HAL_Driver\Inc\Legacy;Drivers\STM32F1xx_HAL_Driver\Src;Drivers/CMSIS/Include;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../dsdlc_g;../libuavcan/libuavcan/include;../libuavcan/libuavcan_drivers/stm32/driver/include;Drivers\CMSIS\Device\ST\STM32F1xx\Include;Drivers/CMSIS/Include;Inc;Drivers\STM32F1xx_HAL_Driver\Inc;Drivers\STM32F1xx_HAL_Driver\Inc\Legacy;Drivers\STM32F1xx_HAL_Driver\Src;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>flash_layout;STM32F103xE;DEBUG=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions />
       <CLanguageStandard />
-      <CPPLanguageStandard />
+      <CPPLanguageStandard>GNUPP14</CPPLanguageStandard>
     </ClCompile>
     <Link>
-      <LibrarySearchDirectories>%(Link.LibrarySearchDirectories)</LibrarySearchDirectories>
-      <AdditionalLibraryNames>%(Link.AdditionalLibraryNames)</AdditionalLibraryNames>
-      <AdditionalLinkerInputs>%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
+      <LibrarySearchDirectories>;%(Link.LibrarySearchDirectories)</LibrarySearchDirectories>
+      <AdditionalLibraryNames>;%(Link.AdditionalLibraryNames)</AdditionalLibraryNames>
+      <AdditionalLinkerInputs>;%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
       <AdditionalOptions />
       <LinkerScript />
     </Link>
@@ -76,6 +76,37 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   <ItemGroup>
+    <ClCompile Include="..\libuavcan\libuavcan\src\driver\uc_can.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\marshal\uc_bit_array_copy.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\marshal\uc_bit_stream.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\marshal\uc_float_spec.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\marshal\uc_scalar_codec.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\node\uc_generic_publisher.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\node\uc_generic_subscriber.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\node\uc_global_data_type_registry.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\node\uc_scheduler.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\node\uc_service_client.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\node\uc_timer.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\protocol\uc_dynamic_node_id_client.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\protocol\uc_node_status_provider.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_can_acceptance_filter_configurator.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_can_io.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_crc.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_dispatcher.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_frame.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_outgoing_transfer_registry.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_transfer.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_transfer_buffer.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_transfer_listener.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_transfer_receiver.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_transfer_sender.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\uc_data_type.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\uc_dynamic_memory.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan\src\uc_error.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan_drivers\stm32\driver\src\uc_stm32_can.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan_drivers\stm32\driver\src\uc_stm32_clock.cpp" />
+    <ClCompile Include="..\libuavcan\libuavcan_drivers\stm32\driver\src\uc_stm32_thread.cpp" />
+    <ClCompile Include="config\config.cpp" />
     <ClCompile Include="Src\stm32f1xx_it.c" />
     <ClCompile Include="Src\stm32f1xx_hal_msp.c" />
     <ClCompile Include="Src\main.cpp" />
@@ -93,12 +124,17 @@
     <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_flash.c" />
     <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_flash_ex.c" />
     <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_gpio.c" />
+    <ClCompile Include="Src\uavcan_node.cpp" />
+    <ClInclude Include="..\libuavcan\libuavcan\include\uavcan\build_config.hpp" />
+    <ClInclude Include="..\libuavcan\libuavcan_drivers\stm32\driver\include\uavcan_stm32\build_config.hpp" />
+    <ClInclude Include="Inc\chip.h" />
+    <ClInclude Include="Inc\main.hpp" />
+    <ClInclude Include="Inc\uavcan_node.hpp" />
     <None Include="stm32.props" />
     <ClCompile Include="$(BSP_ROOT)\STM32F1xxxx\StartupFiles\startup_stm32f103xe.c" />
     <ClInclude Include="Inc\NumericConvertions.hpp" />
     <ClInclude Include="Inc\stm32f1xx_it.h" />
     <ClInclude Include="Inc\stm32f1xx_hal_conf.h" />
-    <ClInclude Include="Inc\main.hpp" />
     <ClInclude Include="Drivers\CMSIS\Device\ST\STM32F1xx\Include\stm32f1xx.h" />
     <ClInclude Include="Drivers\CMSIS\Device\ST\STM32F1xx\Include\system_stm32f1xx.h" />
     <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h" />

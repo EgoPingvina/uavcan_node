@@ -1,6 +1,5 @@
 #include "uavcan_node.hpp"
 #include "stm32f1xx_hal.h"
-#include "main.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -28,20 +27,15 @@
 #include <uavcan_stm32/can.hpp>
 #include <uavcan_stm32/bxcan.hpp>
 #include <uavcan/error.hpp>
-//#include <uavcan/protocol/restart_request_server.hpp>
 
 #include <unordered_map>
 #include <uavcan/protocol/node_info_retriever.hpp>      // For uavcan::NodeInfoRetriever
 
-#include  <config/config.hpp>
+#include <config/config.hpp>
 #include <config/config_storage.hpp>
 
-//#define NODE_INFO_LISTENER
-//#define NODE_STATUS_MONITOR
 #define ENUMERATION
 #define PARAM_SERVER
-//#define ENUM_CLIENT
-//#define PARAM_CLIENT
 
 namespace uavcan_node
 {
@@ -52,6 +46,7 @@ namespace uavcan_node
 		*/
 		class RestartRequestHandler : public uavcan::IRestartRequestHandler
 		{
+		public:
 			bool handleRestartRequest(uavcan::NodeID request_source) override
 			{
 				//os::lowsyslog("UAVCAN: Restarting by request from %i\n", int(request_source.get()));
@@ -154,120 +149,10 @@ namespace uavcan_node
 		{
 			static Node mynode(getCanDriver(), getSystemClock());
 			return mynode;
-		}		
-#ifdef PARAM_CLIENT
-		uavcan::ServiceClient<uavcan::protocol::param::GetSet> _enumeration_getset_client(getNode());
-
-		void cb_enumeration_getset(const uavcan::ServiceCallResult<uavcan::protocol::param::GetSet> &result)
-		{
-			if (!result.isSuccessful()) {
-				//warnx("UAVCAN ESC enumeration: save request for node %hhu timed out.", result.getCallID().server_node_id.get());
-				error_code = -1;
-			}
-			else {
-//				warnx("UAVCAN ESC enumeration: save request for node %hhu completed OK.", result.getCallID().server_node_id.get());
-//
-//				uavcan::protocol::param::GetSet::Response resp = result.getResponse();
-//				uint8_t esc_index = (uint8_t)resp.value.to<uavcan::protocol::param::Value::Tag::integer_value>();
-//				esc_index = math::min((uint8_t)(uavcan::equipment::esc::RawCommand::FieldTypes::cmd::MaxSize - 1), esc_index);
-//				_esc_enumeration_index = math::max(_esc_enumeration_index, (uint8_t)(esc_index + 1));
-//
-//				_esc_enumeration_ids[esc_index] = result.getCallID().server_node_id.get();
-//
-//				uavcan::protocol::param::ExecuteOpcode::Request opcode_req;
-//				opcode_req.opcode = opcode_req.OPCODE_SAVE;
-//				int call_res = _enumeration_save_client.call(result.getCallID().server_node_id, opcode_req);
-//
-//				if (call_res < 0) {
-//					warnx("UAVCAN ESC enumeration: couldn't send ExecuteOpcode: %d", call_res);
-//
-//				}
-//				else {
-//					warnx("UAVCAN ESC enumeration: sent ExecuteOpcode to node %hhu (index %hhu)",
-//						_esc_enumeration_ids[esc_index],
-//						esc_index);
-//				}
-			}
 		}
-#endif 
-#ifdef ENUM_CLIENT		
-		uavcan::ServiceClient<uavcan::protocol::enumeration::Begin> _enumeration_client(getNode());
-		
-		void cb_enumeration_begin(const uavcan::ServiceCallResult<uavcan::protocol::enumeration::Begin> &result)
-		{
-			//uint8_t next_id = get_next_active_node_id(result.getCallID().server_node_id.get());
 
-			if (!result.isSuccessful()) {
-				//warnx("UAVCAN ESC enumeration: begin request for node %hhu timed out.", result.getCallID().server_node_id.get());
-				error_code = 0;
-			}
-			else if (result.getResponse().error) {
-//				warnx("UAVCAN ESC enumeration: begin request for node %hhu rejected: %hhu",
-//					result.getCallID().server_node_id.get(),
-//					result.getResponse().error);
-					error_code = result.getResponse().error;
-
-			}
-//			else {
-//				_esc_count++;
-//				warnx("UAVCAN ESC enumeration: begin request for node %hhu completed OK.", result.getCallID().server_node_id.get());
-//			}
-//			if (next_id < 128) {
-//				// Still other active nodes to send the request to
-//				uavcan::protocol::enumeration::Begin::Request req;
-//				// TODO: Incorrect implementation; the parameter name field should be left empty.
-//				//       Leaving it as-is to avoid breaking compatibility with non-compliant nodes.
-//				req.parameter_name = "esc_index";
-//				req.timeout_sec = _esc_enumeration_active ? 65535 : 0;
-//
-//				int call_res = _enumeration_client.call(next_id, req);
-//
-//				if (call_res < 0) {
-//					warnx("UAVCAN ESC enumeration: couldn't send Begin request: %d", call_res);
-//
-//				}
-//				else {
-//					warnx("UAVCAN ESC enumeration: sent Begin request");
-//				}
-//
-//			}
-//			else {
-//				warnx("UAVCAN ESC enumeration: begun enumeration on all nodes.");
-//			}
-		}
-#endif 
 		void cb_10Hz(const uavcan::TimerEvent& event)
-		{				
-			#ifdef ENUM_CLIENT			
-			// Still other active nodes to send the request to
-			uavcan::protocol::enumeration::Begin::Request req;
-			// TODO: Incorrect implementation; the parameter name field should be left empty.
-			//       Leaving it as-is to avoid breaking compatibility with non-compliant nodes.
-			req.parameter_name = "esc_index";
-			//req.timeout_sec = _esc_enumeration_active ? 65535 : 0;
-			req.timeout_sec = 65535;
-			int call_res = _enumeration_client.call(0x06, req);
-
-			if (call_res < 0) {
-				//warnx("UAVCAN ESC enumeration: couldn't send Begin request: %d", call_res);
-				error_code = call_res;
-			} 
-			#endif
-			#ifdef PARAM_CLIENT
-			uavcan::protocol::param::GetSet::Request req;
-			req.name =	"esc_index"; //msg.parameter_name;     // 'esc_index' or something alike, the name is not standardized
-			req.value.to<uavcan::protocol::param::Value::Tag::integer_value>() = 1;
-
-			int call_res = _enumeration_getset_client.call(0x06, req);
-
-			if (call_res < 0) {
-				//warnx("UAVCAN ESC enumeration: couldn't send GetSet: %d", call_res);
-
-			}
-			else {
-				//warnx("UAVCAN ESC enumeration: sent GetSet to node %hhu (index %d)", _esc_enumeration_ids[i], i);
-			}
-			#endif
+		{
 			//#ifdef true
 			static bool transmit = false; 
 			uavcan::equipment::esc::Status msg;
@@ -838,103 +723,8 @@ namespace uavcan_node
 		};
 		
 		uavcan::LazyConstructor<EnumerationHandler> enumeration_handler_;		
-#endif 
-
-#ifdef NODE_INFO_LISTENER		
-
-		// listener
-		/**
-		 * This class will be collecting information from uavcan::NodeInfoRetriever via the interface uavcan::INodeInfoListener.
-		 * Please refer to the documentation for uavcan::NodeInfoRetriever to learn more.
-		 */
-		class NodeInfoCollector final : public uavcan::INodeInfoListener
-		{
-			struct NodeIDHash
-			{
-				std::size_t operator()(uavcan::NodeID nid) const { return nid.get(); }
-			};
-
-			std::unordered_map<uavcan::NodeID, uavcan::protocol::GetNodeInfo::Response, NodeIDHash> registry_;
-
-			/**
-			 * Called when a response to GetNodeInfo request is received. This happens shortly after the node restarts or
-			 * becomes online for the first time.
-			 * @param node_id   Node ID of the node
-			 * @param response  Node info struct
-			 */
-			void handleNodeInfoRetrieved(uavcan::NodeID node_id,
-				const uavcan::protocol::GetNodeInfo::Response& node_info) override
-			{
-				registry_[node_id] = node_info;
-			}
-
-			/**
-			 * Called when the retriever decides that the node does not support the GetNodeInfo service.
-			 * This method will never be called if the number of attempts is unlimited.
-			 */
-			void handleNodeInfoUnavailable(uavcan::NodeID node_id) override
-			{
-				// In this implementation we're using empty struct to indicate that the node info is missing.
-				registry_[node_id] = uavcan::protocol::GetNodeInfo::Response();
-			}
-
-			/**
-			 * This call is routed directly from @ref NodeStatusMonitor.
-			 * Default implementation does nothing.
-			 * @param event     Node status change event
-			 */
-			void handleNodeStatusChange(const uavcan::NodeStatusMonitor::NodeStatusChangeEvent& event) override
-			{
-				if (event.status.mode == uavcan::protocol::NodeStatus::MODE_OFFLINE)
-				{
-					registry_.erase(event.node_id);
-				}
-			}
-
-			/**
-			 * This call is routed directly from @ref NodeStatusMonitor.
-			 * Default implementation does nothing.
-			 * @param msg       Node status message
-			 */
-			void handleNodeStatusMessage(const uavcan::ReceivedDataStructure<uavcan::protocol::NodeStatus>& msg) override
-			{
-				auto x = registry_.find(msg.getSrcNodeID());
-				if (x != registry_.end())
-				{
-					x->second.status = msg;
-				}
-			}
-
-		public:
-			/**
-			 * Number if known nodes in the registry.
-			 */
-			std::uint8_t getNumberOfNodes() const
-			{
-				return static_cast<std::uint8_t>(registry_.size());
-			}
-
-			/**
-			 * Returns a pointer to the node info structure for the given node, if such node is known.
-			 * If the node is not known, a null pointer will be returned.
-			 * Note that the pointer may be invalidated afterwards, so the object MUST be copied if further use is intended.
-			 */
-			const uavcan::protocol::GetNodeInfo::Response* getNodeInfo(uavcan::NodeID node_id) const
-			{
-				auto x = registry_.find(node_id);
-				if (x != registry_.end())
-				{
-					return &x->second;
-				}
-				else
-				{
-					return nullptr;
-				}
-			}
-		};
-		
-		NodeInfoCollector collector;
 #endif
+
 	}
 	
 	void testRawCmd(void)
@@ -988,36 +778,8 @@ namespace uavcan_node
 		return rawUpdate;
 	}
 
-	bool getRaw(float* raw) {
-		
-		//		if (HAL_GetTick() <= 7500)
-		//		{
-		//			return 0.0f; 
-		//		}
-		//		
-		//		static float raw_sim = 0.0f; 
-		//		if (raw_increase)
-		//		{
-		//			if (raw_sim == 0.0f)
-		//			{
-		//				raw_sim = 1367; 
-		//				return raw_sim / 8191; 
-		//			}
-		//			raw_sim += 50;
-		//			if (raw_sim >= 7000)
-		//			{					
-		//				raw_increase = false; 
-		//			}
-		//		}
-		//		else
-		//		{
-		//			raw_sim -= 50;
-		//			if (raw_sim <= 50)
-		//			{					
-		//				raw_increase = true; 
-		//			}
-		//		}
-		//		return raw_sim/8191; 
+	bool getRaw(float* raw)
+	{		
 		if(rawUpdate) {			
 			rawUpdate = false; 
 			*raw = raw_cmd_pct; 
@@ -1100,23 +862,6 @@ namespace uavcan_node
 //		{
 //			led_red_toggle(); //board::die(res);
 //		}
-#ifdef ENUM_CLIENT
-		const int enum_client_init_res = _enumeration_client.init();
-		if (enum_client_init_res < 0)
-		{			
-			error_code = enum_client_init_res;
-		}		
-		_enumeration_client.setCallback(&cb_enumeration_begin);
-#endif	
-		
-#ifdef PARAM_CLIENT
-		const int enum_gs_client_init_res = _enumeration_getset_client.init();
-		if (enum_gs_client_init_res < 0)
-		{			
-			error_code = enum_gs_client_init_res;
-		}		
-		_enumeration_getset_client.setCallback(&cb_enumeration_getset);
-#endif	
 		
 #ifdef PARAM_SERVER		
 		// инициализация 
@@ -1136,37 +881,7 @@ namespace uavcan_node
 			error_code = enumeration_handler_res;
 		}	
 #endif 
-		
-#ifdef NODE_INFO_LISTENER		
-	/*
-     * Initializing the node info retriever object.
-     */
-		uavcan::NodeInfoRetriever retriever(mynode);
 
-		const int retriever_res = retriever.start();
-		if (retriever_res < 0)
-		{
-			//throw std::runtime_error("Failed to start the retriever; error: " + std::to_string(retriever_res));
-			error_code = retriever_res;
-		}
-
-		/*
-		 * This class is defined above in this file.
-		 */
-//		NodeInfoCollector collector;
-
-		/*
-		 * Registering our collector against the retriever object.
-		 * The retriever class may keep the pointers to listeners in the dynamic memory pool,
-		 * therefore the operation may fail if the node runs out of memory in the pool.
-		 */
-		const int add_listener_res = retriever.addListener(&collector);
-		if (add_listener_res < 0)
-		{
-			//throw std::runtime_error("Failed to add listener; error: " + std::to_string(add_listener_res));
-			error_code = add_listener_res; 
-		}
-#endif 
 		mynode.setModeOperational();	
 		
 		// Config
@@ -1177,35 +892,7 @@ namespace uavcan_node
 			error_code = -1; //die(config_init_res);
 		}
 		self_index = param_esc_index.get();
-			
-//		NodeStartSub();
-//	    NodeStartPub(); 
-//		
-//		while (1)
-//		{
-//			const int spin_res = getNode().spin(uavcan::MonotonicDuration::fromMSec(100));
-//			if (spin_res != 0)
-//			{
-//				error_code = spin_res;
-//				//return spin_res;
-//			}
-// 
-//#ifdef NODE_INFO_LISTENER
-//			bool isNodeInfo = false; 
-//			for (std::uint8_t i = 1; i <= uavcan::NodeID::Max; i++)
-//			{
-//				if (auto p = collector.getNodeInfo(i))
-//				{				
-//					if (p->name.size() > 0)
-//					{
-//						isNodeInfo = true; 	
-//					}
-//					//std::cout << "\033[32m---------- " << int(i) << " ----------\033[39m\n" // This line will be colored
-//					//          << *p << std::endl;				
-//				}
-//			}
-//#endif				
-//		}
+
 		return 0; 
 	}
 
@@ -1332,35 +1019,14 @@ namespace uavcan_node
 //		}
 	}
 
-	int NodeSpin() {
-
-		/////*
-		////* Spinning for n second.
-		////* The method spin() may return earlier if an error occurs (e.g. driver failure).
-		////* All error codes are listed in the header uavcan/error.hpp.
-		////*/
+	int NodeSpin()
+	{		
 		const int spin_res = getNode().spin(uavcan::MonotonicDuration::fromMSec(100));
 		if (spin_res != 0)
 		{
 			error_code = spin_res;
 			//return spin_res;
-		}
- 
-#ifdef NODE_INFO_LISTENER
-		bool isNodeInfo = false; 
-		for (std::uint8_t i = 1; i <= uavcan::NodeID::Max; i++)
-		{
-			if (auto p = collector.getNodeInfo(i))
-			{				
-				if (p->name.size() > 0)
-				{
-					isNodeInfo = true; 	
-				}
-				//std::cout << "\033[32m---------- " << int(i) << " ----------\033[39m\n" // This line will be colored
-				//          << *p << std::endl;				
-			}
-		}
-#endif		
+		}	
 		return 0; 
 	}
 }

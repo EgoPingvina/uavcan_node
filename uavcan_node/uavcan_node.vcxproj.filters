@@ -94,6 +94,33 @@
     <Filter Include="VisualGDB settings">
       <UniqueIdentifier>{dc45df86-a6de-4297-bb4e-7fc832c8dad5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{3a69c48c-160d-452d-b828-91d7b95154f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\uavcan">
+      <UniqueIdentifier>{f74a7a1a-b3d5-4b7c-93c8-2a17ded4114e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\uavcan\driver">
+      <UniqueIdentifier>{db35b407-474b-4419-a139-e6e2a99ca3f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\uavcan\marshal">
+      <UniqueIdentifier>{de779506-bf12-419a-acdd-e604c1aa2148}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\uavcan\protocol">
+      <UniqueIdentifier>{378088e3-d0df-4177-9a75-d69a571e025d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\uavcan\node">
+      <UniqueIdentifier>{504fddac-d31f-4f72-bae3-403cadf68c95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\uavcan\transport">
+      <UniqueIdentifier>{5c5571e1-a42b-48fd-b177-f71a50713450}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\uavcan_driver">
+      <UniqueIdentifier>{e8352739-44f8-4273-b4a4-5ff49c295651}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\uavcan">
+      <UniqueIdentifier>{090d33b3-fb51-40f9-91b7-8984dec558ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\stm32f1xx_it.c">
@@ -228,12 +255,120 @@
     <ClCompile Include="Src\main.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="Src\uavcan_node.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="config\config.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\driver\uc_can.cpp">
+      <Filter>Source files\uavcan\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\marshal\uc_bit_array_copy.cpp">
+      <Filter>Source files\uavcan\marshal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\marshal\uc_bit_stream.cpp">
+      <Filter>Source files\uavcan\marshal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\marshal\uc_float_spec.cpp">
+      <Filter>Source files\uavcan\marshal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\marshal\uc_scalar_codec.cpp">
+      <Filter>Source files\uavcan\marshal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\protocol\uc_dynamic_node_id_client.cpp">
+      <Filter>Source files\uavcan\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\protocol\uc_node_status_provider.cpp">
+      <Filter>Source files\uavcan\protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\node\uc_generic_publisher.cpp">
+      <Filter>Source files\uavcan\node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\node\uc_generic_subscriber.cpp">
+      <Filter>Source files\uavcan\node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\node\uc_global_data_type_registry.cpp">
+      <Filter>Source files\uavcan\node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\node\uc_scheduler.cpp">
+      <Filter>Source files\uavcan\node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\node\uc_service_client.cpp">
+      <Filter>Source files\uavcan\node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\node\uc_timer.cpp">
+      <Filter>Source files\uavcan\node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_can_acceptance_filter_configurator.cpp">
+      <Filter>Source files\uavcan\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_can_io.cpp">
+      <Filter>Source files\uavcan\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_crc.cpp">
+      <Filter>Source files\uavcan\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_dispatcher.cpp">
+      <Filter>Source files\uavcan\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_frame.cpp">
+      <Filter>Source files\uavcan\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_outgoing_transfer_registry.cpp">
+      <Filter>Source files\uavcan\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_transfer.cpp">
+      <Filter>Source files\uavcan\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_transfer_buffer.cpp">
+      <Filter>Source files\uavcan\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_transfer_listener.cpp">
+      <Filter>Source files\uavcan\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_transfer_receiver.cpp">
+      <Filter>Source files\uavcan\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\transport\uc_transfer_sender.cpp">
+      <Filter>Source files\uavcan\transport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\uc_data_type.cpp">
+      <Filter>Source files\uavcan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\uc_dynamic_memory.cpp">
+      <Filter>Source files\uavcan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan\src\uc_error.cpp">
+      <Filter>Source files\uavcan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan_drivers\stm32\driver\src\uc_stm32_can.cpp">
+      <Filter>Source files\uavcan_driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan_drivers\stm32\driver\src\uc_stm32_clock.cpp">
+      <Filter>Source files\uavcan_driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libuavcan\libuavcan_drivers\stm32\driver\src\uc_stm32_thread.cpp">
+      <Filter>Source files\uavcan_driver</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Inc\main.hpp">
+    <ClInclude Include="Inc\NumericConvertions.hpp">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\NumericConvertions.hpp">
+    <ClInclude Include="Inc\uavcan_node.hpp">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libuavcan\libuavcan\include\uavcan\build_config.hpp">
+      <Filter>Header files\uavcan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libuavcan\libuavcan_drivers\stm32\driver\include\uavcan_stm32\build_config.hpp">
+      <Filter>Header files\uavcan</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\chip.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\main.hpp">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

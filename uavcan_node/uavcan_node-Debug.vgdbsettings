@@ -16,7 +16,10 @@
       </Version>
     </ToolchainID>
     <ProjectFile>uavcan_node.vcxproj</ProjectFile>
-    <ParallelJobCount>0</ParallelJobCount>
+    <RemoteBuildEnvironment>
+      <Records />
+    </RemoteBuildEnvironment>
+    <ParallelJobCount>1</ParallelJobCount>
     <SuppressDirectoryChangeMessages>true</SuppressDirectoryChangeMessages>
   </Build>
   <Debug xsi:type="com.visualgdb.debug.embedded">

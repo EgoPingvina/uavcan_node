@@ -10,10 +10,17 @@ extern "C" {
 
 #include "stm32f1xx_hal.h"
 
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+#include "stdbool.h"
 
-/* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
+/// <summary>
+/// This function is executed in case of error occurrence.
+/// </summary>
+void ErrorHandler(char * file, int line);
+
+/// <summary>
+/// This function is executed in case of error occurrence(Macro definition under ErrorHandler(char * file, int line))
+/// </summary>
+#define Error_Handler() ErrorHandler(__FILE__, __LINE__)
 
 #ifdef __cplusplus
 }
