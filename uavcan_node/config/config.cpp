@@ -327,90 +327,90 @@ float configGet(const char* name)
 
 namespace os
 {
-namespace config
-{
+	namespace config
+	{
 
-int init(IStorageBackend* storage)
-{
-    ASSERT_ALWAYS(_num_params <= CONFIG_PARAMS_MAX);  // being paranoid
-    ASSERT_ALWAYS(!_frozen);
+		int init(IStorageBackend* storage)
+		{
+			ASSERT_ALWAYS(_num_params <= CONFIG_PARAMS_MAX);  // being paranoid
+			ASSERT_ALWAYS(!_frozen);
 
-    if (storage == nullptr)
-    {
-        return -EINVAL;
-    }
+			if (storage == nullptr)
+			{
+				return -EINVAL;
+			}
 
-    g_storage = storage;
+			g_storage = storage;
 
-    _frozen = true;
+			_frozen = true;
 
-    int retval = 0;
+			int retval = 0;
 
-    // Read the layout hash
-    std::uint32_t stored_layout_hash = 0xdeadbeef;
-    int flash_res = g_storage->read(OFFSET_LAYOUT_HASH, &stored_layout_hash, 4);
-    if (flash_res)
-    {
-        goto flash_error;
-    }
+			// Read the layout hash
+			std::uint32_t stored_layout_hash = 0xdeadbeef;
+			int flash_res = g_storage->read(OFFSET_LAYOUT_HASH, &stored_layout_hash, 4);
+			if (flash_res)
+			{
+				goto flash_error;
+			}
 
-    // If the layout hash has not changed, we can restore the values safely
-    if (stored_layout_hash == _layout_hash)
-    {
-        const int pool_len = _num_params * sizeof(_value_pool[0]);
+			// If the layout hash has not changed, we can restore the values safely
+			if (stored_layout_hash == _layout_hash)
+			{
+				const int pool_len = _num_params * sizeof(_value_pool[0]);
 
-        // Read the data
-        flash_res = g_storage->read(OFFSET_VALUES, _value_pool, pool_len);
-        if (flash_res)
-        {
-            goto flash_error;
-        }
+				// Read the data
+				flash_res = g_storage->read(OFFSET_VALUES, _value_pool, pool_len);
+				if (flash_res)
+				{
+					goto flash_error;
+				}
 
-        // Check CRC
-        const std::uint32_t true_crc = crc32(_value_pool, pool_len);
-        std::uint32_t stored_crc = 0;
-        flash_res = g_storage->read(OFFSET_CRC, &stored_crc, 4);
-        if (flash_res)
-        {
-            goto flash_error;
-        }
+				// Check CRC
+				const std::uint32_t true_crc = crc32(_value_pool, pool_len);
+				std::uint32_t stored_crc = 0;
+				flash_res = g_storage->read(OFFSET_CRC, &stored_crc, 4);
+				if (flash_res)
+				{
+					goto flash_error;
+				}
 
-        // Reinitialize defaults if restored values are not valid or if CRC does not match
-        if (true_crc == stored_crc)
-        {
-            retval = InitCodeRestored;
-            for (int i = 0; i < _num_params; i++)
-            {
-                if (!isValid(_descr_pool[i], _value_pool[i]))
-                {
-                    _value_pool[i] = _descr_pool[i]->default_;
-                }
-            }
-        }
-        else
-        {
-            reinitializeDefaults();
-            retval = InitCodeCRCMismatch;
-        }
-    }
-    else
-    {
-        reinitializeDefaults();
-        retval = InitCodeLayoutMismatch;
-    }
+				// Reinitialize defaults if restored values are not valid or if CRC does not match
+				if (true_crc == stored_crc)
+				{
+					retval = InitCodeRestored;
+					for (int i = 0; i < _num_params; i++)
+					{
+						if (!isValid(_descr_pool[i], _value_pool[i]))
+						{
+							_value_pool[i] = _descr_pool[i]->default_;
+						}
+					}
+				}
+				else
+				{
+					reinitializeDefaults();
+					retval = InitCodeCRCMismatch;
+				}
+			}
+			else
+			{
+				reinitializeDefaults();
+				retval = InitCodeLayoutMismatch;
+			}
 
-    return retval;
+			return retval;
 
-    flash_error:
-    assert(flash_res);
-    reinitializeDefaults();
-    return flash_res;
-}
+		flash_error:
+			assert(flash_res);
+			reinitializeDefaults();
+			return flash_res;
+		}
 
-unsigned getModificationCounter()
-{
-    return _modification_cnt;           // Atomic access
-}
+		unsigned getModificationCounter()
+		{
+			return _modification_cnt;           // Atomic access
+		}
 
-}
+	}
 }

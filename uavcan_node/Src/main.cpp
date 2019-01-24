@@ -1,11 +1,16 @@
 #include "main.hpp"
-#include "uavcan_node.hpp"
+#include "ESCController.hpp"
 #include "NumericConvertions.hpp"
 
 /// <summary>
 /// Delay to initialize pwm motor controller
 /// </summary>
-const uint32_t START_DELAY_MS = 5000;
+const uint32_t startDelayMs = 5000;
+
+/// <summary>
+/// Period of led blinking(2 times per second)
+/// </summary>
+const uint32_t lifeIndicationPeriod = 500;
 
 CAN_HandleTypeDef hcan;
 
@@ -209,27 +214,31 @@ int main(void)
 	MX_CAN_Init();
 	MX_TIM3_Init();
 	MX_USART2_UART_Init();
-
-	uavcan_node::configureNode();
-	uavcan_node::NodeStartSub();
-	uavcan_node::NodeStartPub();
+	
+	ESCController controller;
+	if (controller.Initialize() != 0)
+		Error_Handler();
 
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 	
-	// it needs for ESC controller
-	HAL_Delay(START_DELAY_MS);
+	// it needs for ESC controller initialize
+	HAL_Delay(startDelayMs);
 
 	/* Infinite loop */
 	while (1)
 	{
-		uavcan_node::NodeSpin();
+		controller.NodeSpin();
 
 		int value = 0;
-		if (uavcan_node::getIntRaw(&value))
+		if (controller.GetRaw(&value))
 			TIM3->CCR2 = TIM3->CCR1 =
 				value < 1
 				? 900
 				: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);
+		
+		// life indication
+		if (HAL_GetTick() % lifeIndicationPeriod == 0)
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
 	}
 }

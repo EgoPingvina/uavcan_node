@@ -255,9 +255,6 @@
     <ClCompile Include="Src\main.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
-    <ClCompile Include="Src\uavcan_node.cpp">
-      <Filter>Source files</Filter>
-    </ClCompile>
     <ClCompile Include="config\config.cpp">
       <Filter>config</Filter>
     </ClCompile>
@@ -351,12 +348,12 @@
     <ClCompile Include="..\libuavcan\libuavcan_drivers\stm32\driver\src\uc_stm32_thread.cpp">
       <Filter>Source files\uavcan_driver</Filter>
     </ClCompile>
+    <ClCompile Include="Src\ESCController.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\NumericConvertions.hpp">
-      <Filter>Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\uavcan_node.hpp">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="..\libuavcan\libuavcan\include\uavcan\build_config.hpp">
@@ -369,6 +366,9 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="Inc\main.hpp">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ESCController.hpp">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

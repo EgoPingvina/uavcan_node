@@ -18,6 +18,7 @@
     <ProjectFile>uavcan_node.vcxproj</ProjectFile>
     <RemoteBuildEnvironment>
       <Records />
+      <EnvironmentSetupFiles />
     </RemoteBuildEnvironment>
     <ParallelJobCount>1</ParallelJobCount>
     <SuppressDirectoryChangeMessages>true</SuppressDirectoryChangeMessages>
@@ -108,7 +109,7 @@
   <UserDefinedVariables />
   <ImportedPropertySheets />
   <CodeSense>
-    <Enabled>False</Enabled>
+    <Enabled>True</Enabled>
     <CFLAGS />
     <CXXFLAGS />
     <ExternalSourceFileList />

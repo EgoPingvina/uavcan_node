@@ -35,7 +35,7 @@ typedef struct
 #endif
 
 #define CONFIG_PARAM_RAW_(name, default_, min, max, type)             \
-    static const ConfigParam GLUE(_config_local_param_, __LINE__) =   \
+    static constexpr ConfigParam GLUE(_config_local_param_, __LINE__) =   \
         {name, default_, min, max, type};                             \
     __attribute__((constructor, unused))                              \
     static void GLUE(_config_local_constructor_, __LINE__)(void) {    \
