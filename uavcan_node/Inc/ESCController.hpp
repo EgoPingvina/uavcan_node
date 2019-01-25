@@ -32,7 +32,7 @@ namespace
 	/// Memory pool size largely depends on the number of CAN ifaces and on application's logic.
 	/// Please read the documentation for the class uavcan::Node to learn more.
 	/// </summary>
-	static constexpr unsigned nodeMemoryPoolSize	= 16384;  // 4KB - 512KB
+	static constexpr unsigned nodeMemoryPoolSize = 16384;  // 4KB - 512KB
 	
 	typedef uavcan::Node<nodeMemoryPoolSize> Node;
 	
@@ -82,9 +82,9 @@ private:
 	
 	bool isRawUpdate = false;
 	
-	uavcan::Publisher<uavcan::equipment::esc::Status>* pub_status;
+	uavcan::Publisher<uavcan::equipment::esc::Status>* statusPublisher;
 
-	os::config::Param<unsigned> param_esc_index;
+	os::config::Param<unsigned> paramESCIndex;
 	
 	/// <summary>
 	/// Node object will be constructed at the time of the first access.
@@ -103,13 +103,13 @@ private:
 	/// </summary>
 	void RawCommandCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::esc::RawCommand>& msg);
 
-	UniqueID read_unique_id() const;
+	UniqueID ReadUID() const;
 
 	uavcan::ICanDriver& GetCanDriver() const;
 	
-	/*
-	 * Restart handler
-	 */
+	/// <summary>
+	/// Restart handler
+	/// </summary>
 	class RestartRequestHandler : public uavcan::IRestartRequestHandler
 	{
 		bool handleRestartRequest(uavcan::NodeID request_source) override
