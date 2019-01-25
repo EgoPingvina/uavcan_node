@@ -225,6 +225,7 @@ int main(void)
 	// it needs for ESC controller initialize
 	HAL_Delay(startDelayMs);
 
+	uint32_t lastToggle = 0;
 	/* Infinite loop */
 	while (1)
 	{
@@ -234,11 +235,14 @@ int main(void)
 		if (controller.GetRaw(&value))
 			TIM3->CCR2 = TIM3->CCR1 =
 				value < 1
-				? 900
-				: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);
+					? 900
+					: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);
 		
 		// life indication
-		if (HAL_GetTick() % lifeIndicationPeriod == 0)
+		if (HAL_GetTick() >= lastToggle + lifeIndicationPeriod)
+		{
 			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+			lastToggle = HAL_GetTick();
+		}
 	}
 }

@@ -37,7 +37,10 @@ int ESCController::Initialize()
 #pragma region Subscription initialize
 	
 	static uavcan::Subscriber<uavcan::equipment::esc::RawCommand> sub_raw_command(this->GetNode());
-	isOk = sub_raw_command.start(RawCommandCallback);	
+	isOk = sub_raw_command.start(
+		RawCommandCallbackBinder(
+			this,
+			&ESCController::RawCommandCallback));	
 	if (isOk != 0)
 		return isOk;
 
@@ -53,7 +56,10 @@ int ESCController::Initialize()
 	if (isOk != 0)
 		return isOk;
 	
-	statusSender.setCallback(&StatusCallback);
+	statusSender.setCallback(
+		StatusCallbackBinder(
+			this,
+			&ESCController::StatusCallback));
 	statusSender.startPeriodic(uavcan::MonotonicDuration::fromMSec(100));  	// 10Hz
 
 #pragma endregion

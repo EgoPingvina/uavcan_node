@@ -64,6 +64,14 @@ public:
 private:
 	#define ENUMERATION
 	#define PARAM_SERVER
+	
+	typedef uavcan::MethodBinder<ESCController*,
+        void(ESCController::*)(const uavcan::TimerEvent&) const>
+            StatusCallbackBinder;
+	
+	typedef uavcan::MethodBinder<ESCController*,
+        void(ESCController::*)(const uavcan::ReceivedDataStructure<uavcan::equipment::esc::RawCommand>&)>
+            RawCommandCallbackBinder;
 
 	static constexpr int rxQueueSize				= 64;
 
