@@ -132,6 +132,11 @@ int ServoController::NodeSpin() const
 {
 	return this->GetNode().spin(uavcan::MonotonicDuration::fromMSec(100));
 }
+	
+unsigned ServoController::SelfIndex() const
+{
+	return this->selfIndex;
+}
 
 bool ServoController::IsValueUpdate(void) const
 {		 

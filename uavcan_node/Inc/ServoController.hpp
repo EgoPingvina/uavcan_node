@@ -48,6 +48,8 @@ public:
 	/// </summary>
 	int NodeSpin() const;
 	
+	unsigned SelfIndex() const;
+	
 	bool IsValueUpdate(void) const;
 	
 	bool GetRaw(int* raw);

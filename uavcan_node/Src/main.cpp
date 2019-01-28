@@ -49,11 +49,11 @@ void SystemClock_Config(void)
 	
 	/**Initializes the CPU, AHB and APB busses clocks 
 	*/
-	RCC_ClkInitStruct.ClockType			= RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
-	RCC_ClkInitStruct.SYSCLKSource		= RCC_SYSCLKSOURCE_PLLCLK;
-	RCC_ClkInitStruct.AHBCLKDivider		= RCC_SYSCLK_DIV1;
-	RCC_ClkInitStruct.APB1CLKDivider	= RCC_HCLK_DIV2;
-	RCC_ClkInitStruct.APB2CLKDivider	= RCC_HCLK_DIV1;
+	RCC_ClkInitStruct.ClockType				= RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+	RCC_ClkInitStruct.SYSCLKSource			= RCC_SYSCLKSOURCE_PLLCLK;
+	RCC_ClkInitStruct.AHBCLKDivider			= RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider		= RCC_HCLK_DIV2;
+	RCC_ClkInitStruct.APB2CLKDivider		= RCC_HCLK_DIV1;
 	
 	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
 		Error_Handler();
@@ -64,18 +64,18 @@ void SystemClock_Config(void)
 /// </summary>
 static void MX_CAN_Init(void)
 {
-	hcan.Instance					= CAN1;
-	hcan.Init.Prescaler				= 2;
-	hcan.Init.Mode					= CAN_MODE_NORMAL;
-	hcan.Init.SyncJumpWidth			= CAN_SJW_1TQ;
-	hcan.Init.TimeSeg1				= CAN_BS1_13TQ;
-	hcan.Init.TimeSeg2				= CAN_BS2_2TQ;
-	hcan.Init.TimeTriggeredMode		= DISABLE;
-	hcan.Init.AutoBusOff			= DISABLE;
-	hcan.Init.AutoWakeUp			= DISABLE;
-	hcan.Init.AutoRetransmission	= DISABLE;
-	hcan.Init.ReceiveFifoLocked		= DISABLE;
-	hcan.Init.TransmitFifoPriority	= DISABLE;
+	hcan.Instance						= CAN1;
+	hcan.Init.Prescaler					= 2;
+	hcan.Init.Mode						= CAN_MODE_NORMAL;
+	hcan.Init.SyncJumpWidth				= CAN_SJW_1TQ;
+	hcan.Init.TimeSeg1					= CAN_BS1_13TQ;
+	hcan.Init.TimeSeg2					= CAN_BS2_2TQ;
+	hcan.Init.TimeTriggeredMode			= DISABLE;
+	hcan.Init.AutoBusOff				= DISABLE;
+	hcan.Init.AutoWakeUp				= DISABLE;
+	hcan.Init.AutoRetransmission		= DISABLE;
+	hcan.Init.ReceiveFifoLocked			= DISABLE;
+	hcan.Init.TransmitFifoPriority		= DISABLE;
 	  
 	if (HAL_CAN_Init(&hcan) != HAL_OK)
 		Error_Handler();
@@ -91,17 +91,17 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
 		/* TIM3 GPIO Configuration
 		 * PA6     ------> TIM3_CH1
 		 */
-		GPIO_InitStruct.Pin = GPIO_PIN_6;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+		GPIO_InitStruct.Pin				= GPIO_PIN_6;
+		GPIO_InitStruct.Mode			= GPIO_MODE_AF_PP;
+		GPIO_InitStruct.Speed			= GPIO_SPEED_FREQ_LOW;
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 		/* TIM3 GPIO Configuration
 		 * PA7     ------> TIM3_CH2
 		 */
-		GPIO_InitStruct.Pin = GPIO_PIN_7;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+		GPIO_InitStruct.Pin				= GPIO_PIN_7;
+		GPIO_InitStruct.Mode			= GPIO_MODE_AF_PP;
+		GPIO_InitStruct.Speed			= GPIO_SPEED_FREQ_LOW;
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	}
 }
@@ -117,7 +117,12 @@ static void MX_TIM3_Init(void)
 	htim3.Instance						= TIM3;
 	htim3.Init.Prescaler				= 63;
 	htim3.Init.CounterMode				= TIM_COUNTERMODE_UP;
-	htim3.Init.Period					= 2500;
+	htim3.Init.Period					= 
+#if CONTROLLER == CONTROLLER_ESC
+		2500
+#elif CONTROLLER == CONTROLLER_SERVO
+		20000
+#endif		;
 	htim3.Init.ClockDivision			= TIM_CLOCKDIVISION_DIV1;
 	htim3.Init.AutoReloadPreload		= TIM_AUTORELOAD_PRELOAD_DISABLE;
 	  
@@ -149,14 +154,14 @@ static void MX_TIM3_Init(void)
 /// </summary>
 static void MX_USART2_UART_Init(void)
 {
-	huart2.Instance				= USART2;
-	huart2.Init.BaudRate		= 230400;
-	huart2.Init.WordLength		= UART_WORDLENGTH_8B;
-	huart2.Init.StopBits		= UART_STOPBITS_1;
-	huart2.Init.Parity			= UART_PARITY_NONE;
-	huart2.Init.Mode			= UART_MODE_TX_RX;
-	huart2.Init.HwFlowCtl		= UART_HWCONTROL_NONE;
-	huart2.Init.OverSampling	= UART_OVERSAMPLING_16;
+	huart2.Instance						= USART2;
+	huart2.Init.BaudRate				= 230400;
+	huart2.Init.WordLength				= UART_WORDLENGTH_8B;
+	huart2.Init.StopBits				= UART_STOPBITS_1;
+	huart2.Init.Parity					= UART_PARITY_NONE;
+	huart2.Init.Mode					= UART_MODE_TX_RX;
+	huart2.Init.HwFlowCtl				= UART_HWCONTROL_NONE;
+	huart2.Init.OverSampling			= UART_OVERSAMPLING_16;
 		
 	if (HAL_UART_Init(&huart2) != HAL_OK)
 		Error_Handler();
@@ -177,10 +182,10 @@ static void MX_GPIO_Init(void)
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin : PA4 */
-	GPIO_InitStruct.Pin		= GPIO_PIN_4;
-	GPIO_InitStruct.Mode	= GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull	= GPIO_NOPULL;
-	GPIO_InitStruct.Speed	= GPIO_SPEED_FREQ_LOW;
+	GPIO_InitStruct.Pin					= GPIO_PIN_4;
+	GPIO_InitStruct.Mode				= GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull				= GPIO_NOPULL;
+	GPIO_InitStruct.Speed				= GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
