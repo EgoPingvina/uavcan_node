@@ -36,7 +36,7 @@
 /// <summary>
 /// Current node firmware
 /// </summary>
-#define CONTROLLER			CONTROLLER_SERVO	// Manually changeable
+#define CONTROLLER			CONTROLLER_ESC	// Manually changeable
 
 #pragma region Including of specified controller
 
@@ -51,7 +51,7 @@
 /// <summary>
 /// Current device id
 /// </summary>
-const unsigned deviceId		= THROTTLE;  		// Manually changeable
+const unsigned deviceId		= LEFT_BOTTOM;  		// Manually changeable
 
 /// <summary>
 /// Real node id in CAN bus

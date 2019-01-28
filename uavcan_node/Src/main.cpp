@@ -256,15 +256,11 @@ int main(void)
 			        : NumericConvertions::RangeTransform<1000, 2000, 1000, 2000>(value);
 #endif
 		
-#if DEBUG
-		const unsigned int period = 1000000 / 400;
-		unsigned int esc_indication = (period / 8 * uavcan_node::self_esc_index() ;
-		if(esc_indication <= period)
-		{
-			TIM3->CCR3 = esc_indication ;
-		}
-#endif
-
+		// ToDo for check by oscilloscope
+//		const unsigned int period = 1000000 / 400;
+//		unsigned int esc_indication = (period / 8) * controller.SelfIndex() ;
+//		if(esc_indication <= period)
+//			TIM3->CCR3 = esc_indication;
 		
 		// life indication
 		if (HAL_GetTick() >= lastToggle + lifeIndicationPeriod)

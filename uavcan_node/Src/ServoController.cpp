@@ -49,7 +49,6 @@ int ServoController::Initialize()
 
 #pragma endregion
 
-
 #pragma region Publications initialize
 
 	static uavcan::Timer statusSender(this->GetNode());

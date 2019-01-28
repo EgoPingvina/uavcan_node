@@ -139,6 +139,11 @@ int ESCController::NodeSpin() const
 {
 	return this->GetNode().spin(uavcan::MonotonicDuration::fromMSec(100));
 }
+	
+unsigned ESCController::SelfIndex() const
+{
+	return this->selfIndex;
+}
 
 bool ESCController::IsRawUpdate(void) const
 {		 
