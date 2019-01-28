@@ -1,6 +1,7 @@
 #include "main.hpp"
 #include "NumericConvertions.hpp"
 #include "Config.hpp"
+
 /// <summary>
 /// Delay to initialize pwm motor controller
 /// </summary>
@@ -17,7 +18,7 @@ TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart2;
 
-void ErrorHandler(char * file, int line)
+void ErrorHandler(const char * file, int line)
 {
 	// ToDo make a notification about error
 	while (true)
@@ -215,7 +216,7 @@ int main(void)
 	MX_USART2_UART_Init();
 	
 #if CONTROLLER == CONTROLLER_ESC
-	ESCController 				  
+	ESCController 
 #elif CONTROLLER == CONTROLLER_SERVO
 	ServoController 
 #endif		
@@ -226,8 +227,8 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 	
-#if CONTROLLER == CONTROLLER_ESC
 	// it needs for ESC controller initialize
+#if CONTROLLER == CONTROLLER_ESC
 	HAL_Delay(startDelayMs);
 #endif
 
@@ -245,21 +246,25 @@ int main(void)
 					? 900
 					: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);		
 #elif CONTROLLER == CONTROLLER_SERVO
-		int raw = 0;
-		if (uavcan_node::getIntRaw(&raw))
-		{
-			TIM3->CCR2 = TIM3->CCR1 =
-			    raw < 1
-			        ? 950
-			        : NumericConvertions::RangeTransform<1000, 2000, 1000, 2000>(raw);
-		}
+		int value = 0;
+		if (controller.GetRaw(&value))
+			TIM3->CCR2 =
+			    value < 1
+			        ? deviceId == THROTTLE
+						? 950
+						: 1500
+			        : NumericConvertions::RangeTransform<1000, 2000, 1000, 2000>(value);
+#endif
+		
+#if DEBUG
 		const unsigned int period = 1000000 / 400;
-		unsigned int esc_indication = (period / : sunglasses : * uavcan_node::self_esc_index() ;
+		unsigned int esc_indication = (period / 8 * uavcan_node::self_esc_index() ;
 		if(esc_indication <= period)
 		{
 			TIM3->CCR3 = esc_indication ;
 		}
 #endif
+
 		
 		// life indication
 		if (HAL_GetTick() >= lastToggle + lifeIndicationPeriod)

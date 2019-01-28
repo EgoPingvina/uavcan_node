@@ -2,8 +2,8 @@
 
 #pragma region Controller info
 
-#define CONTOLLER_ESC		0
-#define CONTOLLER_SERVO		1
+#define CONTROLLER_ESC		0
+#define CONTROLLER_SERVO	1
 
 #pragma endregion
 
@@ -36,13 +36,13 @@
 /// <summary>
 /// Current node firmware
 /// </summary>
-#define CONTROLLER			CONTOLLER_ESC	// Manually changeable
+#define CONTROLLER			CONTROLLER_SERVO	// Manually changeable
 
 #pragma region Including of specified controller
 
-#if CONTROLLER == CONTOLLER_ESC
+#if CONTROLLER == CONTROLLER_ESC
 	#include "ESCController.hpp"
-#elif CONTROLLER == CONTOLLER_SERVO
+#elif CONTROLLER == CONTROLLER_SERVO
 	#include "ServoController.hpp"
 #endif
 
@@ -51,9 +51,9 @@
 /// <summary>
 /// Current device id
 /// </summary>
-const unsigned deviceId =	RIGHT_TOP;		// Manually changeable
+const unsigned deviceId		= THROTTLE;  		// Manually changeable
 
 /// <summary>
 /// Real node id in CAN bus
 /// </summary>
-const unsigned nodeId =		(deviceId + (CONTROLLER == CONTOLLER_ESC ? ESC_ID_OFFSET : SERVO_ID_OFFSET));
+const unsigned nodeId		= (deviceId + (CONTROLLER == CONTROLLER_ESC ? ESC_ID_OFFSET : SERVO_ID_OFFSET));

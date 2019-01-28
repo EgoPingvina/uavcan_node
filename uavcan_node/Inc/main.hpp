@@ -15,7 +15,7 @@ extern "C" {
 /// <summary>
 /// This function is executed in case of error occurrence.
 /// </summary>
-void ErrorHandler(char * file, int line);
+void ErrorHandler(const char * file, int line);
 
 /// <summary>
 /// This function is executed in case of error occurrence(Macro definition under ErrorHandler(char * file, int line))
