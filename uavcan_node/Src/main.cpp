@@ -1,7 +1,6 @@
 #include "main.hpp"
-#include "ESCController.hpp"
 #include "NumericConvertions.hpp"
-
+#include "Config.hpp"
 /// <summary>
 /// Delay to initialize pwm motor controller
 /// </summary>
@@ -215,15 +214,22 @@ int main(void)
 	MX_TIM3_Init();
 	MX_USART2_UART_Init();
 	
-	ESCController controller;
+#if CONTROLLER == CONTROLLER_ESC
+	ESCController 				  
+#elif CONTROLLER == CONTROLLER_SERVO
+	ServoController 
+#endif		
+		controller;
 	if (controller.Initialize() != 0)
 		Error_Handler();
 
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 	
+#if CONTROLLER == CONTROLLER_ESC
 	// it needs for ESC controller initialize
 	HAL_Delay(startDelayMs);
+#endif
 
 	uint32_t lastToggle = 0;
 	/* Infinite loop */
@@ -231,12 +237,29 @@ int main(void)
 	{
 		controller.NodeSpin();
 
+#if CONTROLLER == CONTROLLER_ESC
 		int value = 0;
-		if (controller.GetRaw(&value))
+		if (controller.GetValue(&value))
 			TIM3->CCR2 = TIM3->CCR1 =
 				value < 1
 					? 900
-					: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);
+					: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);		
+#elif CONTROLLER == CONTROLLER_SERVO
+		int raw = 0;
+		if (uavcan_node::getIntRaw(&raw))
+		{
+			TIM3->CCR2 = TIM3->CCR1 =
+			    raw < 1
+			        ? 950
+			        : NumericConvertions::RangeTransform<1000, 2000, 1000, 2000>(raw);
+		}
+		const unsigned int period = 1000000 / 400;
+		unsigned int esc_indication = (period / : sunglasses : * uavcan_node::self_esc_index() ;
+		if(esc_indication <= period)
+		{
+			TIM3->CCR3 = esc_indication ;
+		}
+#endif
 		
 		// life indication
 		if (HAL_GetTick() >= lastToggle + lifeIndicationPeriod)

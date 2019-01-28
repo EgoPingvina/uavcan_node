@@ -9,10 +9,6 @@
       <UniqueIdentifier>{7ff5303c-d017-49c7-babe-b5e22ba2359f}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource files">
-      <UniqueIdentifier>{25560cae-e1de-44f2-aa38-2f5944a117ec}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
-    </Filter>
     <Filter Include="Source files\Startup">
       <UniqueIdentifier>{5cd06711-2855-4dc8-b4b1-30e9fe56bb0d}</UniqueIdentifier>
     </Filter>
@@ -120,6 +116,12 @@
     </Filter>
     <Filter Include="Header files\uavcan">
       <UniqueIdentifier>{090d33b3-fb51-40f9-91b7-8984dec558ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Controllers">
+      <UniqueIdentifier>{53d9b034-5d3a-4b96-bb7c-b757f9ec4685}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Controllers">
+      <UniqueIdentifier>{f1c23200-d8ff-4b1c-bc8c-011cc267f79d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -349,7 +351,10 @@
       <Filter>Source files\uavcan_driver</Filter>
     </ClCompile>
     <ClCompile Include="Src\ESCController.cpp">
-      <Filter>Source files</Filter>
+      <Filter>Source files\Controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ServoController.cpp">
+      <Filter>Source files\Controllers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -362,14 +367,20 @@
     <ClInclude Include="..\libuavcan\libuavcan_drivers\stm32\driver\include\uavcan_stm32\build_config.hpp">
       <Filter>Header files\uavcan</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\chip.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\main.hpp">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\chip.h">
+      <Filter>Header files\Startup</Filter>
+    </ClInclude>
     <ClInclude Include="Inc\ESCController.hpp">
-      <Filter>Header files</Filter>
+      <Filter>Header files\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ServoController.hpp">
+      <Filter>Header files\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Config.hpp">
+      <Filter>Header files\Startup</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

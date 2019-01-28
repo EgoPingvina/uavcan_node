@@ -18,15 +18,16 @@
 #include <config/config.hpp>
 #include <config/config_storage.hpp>
 
+extern __weak const unsigned deviceId;
+extern __weak const unsigned nodeId;
+
 namespace
-{
-	#define NODE_ID 4
-	#define NODE_NAME "io.px4.sapog"	// "TestController"
-	#define SELF_INDEX_DEFAULT 0		// (NODE_ID - 1)
-	#define SELF_DIR_DEFAULT 1
+{	
+	#define NODE_NAME				"io.px4.rotor"
 	
-	#define SIM_M_ROTATION_START (NODE_ID * 40)
-	#define SIM_M_ROTATION_STOP (SIM_M_ROTATION_START + 20)
+	#define SELF_DIR_DEFAULT		1	
+	#define SIM_M_ROTATION_START	(nodeId * 40)
+	#define SIM_M_ROTATION_STOP		(SIM_M_ROTATION_START + 20)
 	
 	/// <summary>
 	/// Memory pool size largely depends on the number of CAN ifaces and on application's logic.
@@ -59,7 +60,7 @@ public:
 	
 	bool IsRawUpdate(void) const;
 	
-	bool GetRaw(int* raw);
+	bool GetValue(int* raw);
 
 private:
 	#define ENUMERATION
@@ -312,9 +313,9 @@ private:
 				
 			int rotation;
 				
-			if (NODE_ID == 1 || NODE_ID == 2)
+			if (nodeId == 1 || nodeId == 2)
 				rotation = MOTOR_FORCED_ROTATION_FORWARD;
-			else if (NODE_ID == 3 || NODE_ID == 4)
+			else if (nodeId == 3 || nodeId == 4)
 				rotation = MOTOR_FORCED_ROTATION_REVERSE;
 				
 			if (rotation != MOTOR_FORCED_ROTATION_NONE)

@@ -1,9 +1,6 @@
 #pragma once
 
-//#include "stm32f1xx_hal_def.h"
-//#include "stm32f1xx_hal_conf.h"
 #include "stm32f1xx_hal.h"
-//#include "stm32f407xb.h"
 #include "stm32f1xx.h"
 
 #define STM32F1XX

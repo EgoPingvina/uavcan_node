@@ -1,4 +1,4 @@
-#include "stm32f1xx_hal.h"
+﻿#include "stm32f1xx_hal.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -18,17 +18,19 @@
 #include <uavcan_stm32/bxcan.hpp>
 #include <uavcan/error.hpp>
 
-#include "ESCController.hpp"
+#include "ServoController.hpp"
 
-ESCController::ESCController()
+ServoController::ServoController()
 	: configStorageAddress(reinterpret_cast<void*>(0x08000000 + (512 * 1024) - 1024))
-	, paramESCIndex("esc_index", deviceId, 0, 15)
-#ifdef PARAM_SERVER	
-	, paramManager(&this->selfIndex, &this->selfDirection)
-#endif
-{ }
+	, paramNodeId("uavcan_node_id", nodeId, 0, 125)
+	, paramActuatorId("actuator_id", deviceId, 0, 15)
+	, paramPosition("position", 0, 0, 360)
+	, paramForce("force", 1, 0, 1)
+	, paramSpeed("speed", 0, 0, 255)
+	, paramPowerRatingPct("power_rating_pct", 0, 0, 255)
+{}
 
-int ESCController::Initialize()
+int ServoController::Initialize()
 {
 	int isOk = 0;
 
@@ -37,11 +39,11 @@ int ESCController::Initialize()
 
 #pragma region Subscription initialize
 	
-	static uavcan::Subscriber<uavcan::equipment::esc::RawCommand> sub_raw_command(this->GetNode());
-	isOk = sub_raw_command.start(
-		RawCommandCallbackBinder(
+	static uavcan::Subscriber<uavcan::equipment::actuator::ArrayCommand> rawSubscriber(this->GetNode());
+	isOk = rawSubscriber.start(
+		ArrayCommandCallbackBinder(
 			this,
-			&ESCController::RawCommandCallback));	
+			&ServoController::ArrayCommandCallback));	
 	if (isOk != 0)
 		return isOk;
 
@@ -52,7 +54,7 @@ int ESCController::Initialize()
 
 	static uavcan::Timer statusSender(this->GetNode());
 	
-	this->statusPublisher = new uavcan::Publisher<uavcan::equipment::esc::Status>(this->GetNode());
+	this->statusPublisher = new uavcan::Publisher<uavcan::equipment::actuator::Status>(this->GetNode());
 	isOk = this->statusPublisher->init();
 	if (isOk != 0)
 		return isOk;
@@ -60,15 +62,15 @@ int ESCController::Initialize()
 	statusSender.setCallback(
 		StatusCallbackBinder(
 			this,
-			&ESCController::StatusCallback));
-	statusSender.startPeriodic(uavcan::MonotonicDuration::fromMSec(100));  	// 10Hz
+		&ServoController::StatusCallback));
+	statusSender.startPeriodic(uavcan::MonotonicDuration::fromMSec(100));   	// 10Hz
 
 #pragma endregion
 
 	return isOk;
 }
 
-int ESCController::ConfigureNode()
+int ServoController::ConfigureNode()
 {
 	auto& mynode = this->GetNode();
 
@@ -76,15 +78,15 @@ int ESCController::ConfigureNode()
 
 	mynode.setName(NODE_NAME);
 
-	uavcan::protocol::SoftwareVersion sw_version;  // Standard type uavcan.protocol.SoftwareVersion
+	uavcan::protocol::SoftwareVersion sw_version;   // Standard type uavcan.protocol.SoftwareVersion
 	sw_version.major		= 2;
 	sw_version.minor		= 0;
-	sw_version.vcs_commit	= 0xb1354f4; // git rev-parse --short HEAD
-	sw_version.image_crc	= 0x0102030405060708; // image CRC-64-WE see https://uavcan.org/Specification/7._List_of_standard_data_types/ 
+	sw_version.vcs_commit	= 0xb1354f4;  // git rev-parse --short HEAD
+	sw_version.image_crc	= 0x0102030405060708;  // image CRC-64-WE see https://uavcan.org/Specification/7._List_of_standard_data_types/ 
 	sw_version.optional_field_flags |= sw_version.OPTIONAL_FIELD_FLAG_VCS_COMMIT;
 	mynode.setSoftwareVersion(sw_version);
 
-	uavcan::protocol::HardwareVersion hw_version;  // Standard type uavcan.protocol.HardwareVersion
+	uavcan::protocol::HardwareVersion hw_version;   // Standard type uavcan.protocol.HardwareVersion
 	hw_version.major		= 1;
 	hw_version.minor		= 0;
 	const auto uid			= this->ReadUID();
@@ -100,62 +102,54 @@ int ESCController::ConfigureNode()
 		return node_start_res;
 
 	mynode.setRestartRequestHandler(&restart_request_handler);
-	
-#ifdef PARAM_SERVER		
-	// initialization
-	int param_server_res = get_param_server().start(&this->paramManager);
-	if (param_server_res < 0)
-		return param_server_res;
-#endif 		
-
-#ifdef ENUMERATION		
-	enumeration_handler_.construct<uavcan::INode&>(mynode);
-	int enumeration_handler_res = enumeration_handler_->start();
-	if (enumeration_handler_res < 0)
-		return enumeration_handler_res;
-#endif 
 
 	mynode.setModeOperational();
 
-	// Config
+#pragma region Config
+
 	static os::stm32::ConfigStorageBackend config_storage_backend(configStorageAddress, configStorageSize);
 	const int config_init_res = os::config::init(&config_storage_backend);
 
 	if (config_init_res < 0)
 		return -1;
 
-	this->selfIndex = this->paramESCIndex.get();
+	this->selfIndex = this->paramActuatorId.get();
+	this->position	= this->paramPosition.get();
+	this->force		= this->paramForce.get();
+	this->speed		= this->paramSpeed.get();
+	
+#pragma endregion
 
 	return 0;
 }
 
-Node& ESCController::GetNode() const
+Node& ServoController::GetNode() const
 {
 	static Node mynode(this->GetCanDriver(), uavcan_stm32::SystemClock::instance());
 	return mynode;
 }	
 
-int ESCController::NodeSpin() const
+int ServoController::NodeSpin() const
 {
 	return this->GetNode().spin(uavcan::MonotonicDuration::fromMSec(100));
 }
 
-bool ESCController::IsRawUpdate(void) const
+bool ServoController::IsValueUpdate(void) const
 {		 
-	return this->isRawUpdate;
+	return this->isValueUpdate;
 }
 	
-bool ESCController::GetValue(int* raw)
+bool ServoController::GetRaw(int* raw)
 {
-	if (!this->IsRawUpdate())
+	if (!this->IsValueUpdate())
 		return false;
 		
-	this->isRawUpdate = false; 
+	this->isValueUpdate = false; 
 	*raw = this->rawValue; 
 	return true;
 }
 
-UniqueID ESCController::ReadUID() const
+UniqueID ServoController::ReadUID() const
 {
 	UniqueID uid;
 
@@ -165,7 +159,7 @@ UniqueID ESCController::ReadUID() const
 	return uid;
 }
 
-uavcan::ICanDriver& ESCController::GetCanDriver() const
+uavcan::ICanDriver& ServoController::GetCanDriver() const
 {
 	static uavcan_stm32::CanInitHelper<rxQueueSize> can;
 
@@ -183,33 +177,31 @@ uavcan::ICanDriver& ESCController::GetCanDriver() const
 	return can.driver;
 }
 
-void ESCController::StatusCallback(const uavcan::TimerEvent& event) const
+void ServoController::StatusCallback(const uavcan::TimerEvent& event) const
 {
-	uavcan::equipment::esc::Status message;
+	uavcan::equipment::actuator::Status message;
 
 	// ToDo send real data
-	message.esc_index			= this->selfIndex;
-	message.rpm					= 0;
-	message.voltage				= 3.3F;
-	message.current				= 0.001F;
-	message.temperature			= 24.0F;
-	message.power_rating_pct	= static_cast<unsigned>(.5F * 100 + 0.5F);
-	message.error_count			= 0;
+	message.actuator_id			= this->selfIndex;
+	message.force				= this->force; 
+	message.position			= this->position;
+	message.speed				= this->speed; 
+	message.power_rating_pct	= 0.0F;
 
 	this->statusPublisher->broadcast(message);
 }
 
-void ESCController::RawCommandCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::esc::RawCommand>& msg)
+void ServoController::ArrayCommandCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::ArrayCommand>& msg)
 {
-	if (msg.cmd.size() <= this->selfIndex)
+	if (msg.commands.size() <= this->selfIndex)
 	{
-		if (!this->IsRawUpdate())
-			this->isRawUpdate = true;
+		if (!this->isValueUpdate)
+			this->isValueUpdate = true;
 
 		this->rawValue = 0;
 		return;
 	}
 
-	this->rawValue = msg.cmd[this->selfIndex];
-	this->isRawUpdate = true;
+	this->rawValue = msg.commands[this->selfIndex].command_value;
+	this->isValueUpdate = true;
 }
