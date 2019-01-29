@@ -19,16 +19,22 @@
 #include <uavcan/error.hpp>
 
 #include "ServoController.hpp"
+#include "ServoDevices.hpp"
+
+using namespace Controllers;
 
 ServoController::ServoController()
 	: configStorageAddress(reinterpret_cast<void*>(0x08000000 + (512 * 1024) - 1024))
+	, deviceCount(UpBitsCount(deviceId))
 	, paramNodeId("uavcan_node_id", nodeId, 0, 125)
 	, paramActuatorId("actuator_id", deviceId, 0, 15)
 	, paramPosition("position", 0, 0, 360)
 	, paramForce("force", 1, 0, 1)
 	, paramSpeed("speed", 0, 0, 255)
 	, paramPowerRatingPct("power_rating_pct", 0, 0, 255)
-{}
+{
+	this->value = (int*)malloc(this->deviceCount * sizeof(int));
+}
 
 int ServoController::Initialize()
 {
@@ -143,13 +149,13 @@ bool ServoController::IsValueUpdate(void) const
 	return this->isValueUpdate;
 }
 	
-bool ServoController::GetRaw(int* raw)
+bool ServoController::GetValue(int* value)
 {
 	if (!this->IsValueUpdate())
 		return false;
-		
+	
 	this->isValueUpdate = false; 
-	*raw = this->rawValue; 
+	memcpy(value, this->value, this->deviceCount * sizeof(int));
 	return true;
 }
 
@@ -197,15 +203,18 @@ void ServoController::StatusCallback(const uavcan::TimerEvent& event) const
 
 void ServoController::ArrayCommandCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::ArrayCommand>& msg)
 {
-	if (msg.commands.size() <= this->selfIndex)
+	if (msg.commands.size() < (unsigned)ServoDevices::Size)
 	{
 		if (!this->isValueUpdate)
 			this->isValueUpdate = true;
 
-		this->rawValue = 0;
+		this->value = 0;
 		return;
 	}
 
-	this->rawValue = msg.commands[this->selfIndex].command_value;
+	for (unsigned i = 0, position = 0; i < (unsigned)ServoDevices::Size; i++)
+		if (GetBitValue(deviceId, i) == 1)
+			this->value[position++] = msg.commands[i].command_value;
+	
 	this->isValueUpdate = true;
 }

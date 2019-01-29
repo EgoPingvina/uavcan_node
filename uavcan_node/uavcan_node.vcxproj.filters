@@ -356,6 +356,9 @@
     <ClCompile Include="Src\ServoController.cpp">
       <Filter>Source files\Controllers</Filter>
     </ClCompile>
+    <ClCompile Include="Src\CanNode.cpp">
+      <Filter>Source files\Controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\NumericConvertions.hpp">
@@ -381,6 +384,15 @@
     </ClInclude>
     <ClInclude Include="Inc\Config.hpp">
       <Filter>Header files\Startup</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CanNode.hpp">
+      <Filter>Header files\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ServoDevices.hpp">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ESCDevices.hpp">
+      <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

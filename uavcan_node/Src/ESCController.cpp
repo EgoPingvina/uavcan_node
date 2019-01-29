@@ -20,6 +20,8 @@
 
 #include "ESCController.hpp"
 
+using namespace Controllers;
+
 ESCController::ESCController()
 	: configStorageAddress(reinterpret_cast<void*>(0x08000000 + (512 * 1024) - 1024))
 	, paramESCIndex("esc_index", deviceId, 0, 15)

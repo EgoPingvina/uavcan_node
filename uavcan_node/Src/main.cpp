@@ -122,7 +122,8 @@ static void MX_TIM3_Init(void)
 		2500
 #elif CONTROLLER == CONTROLLER_SERVO
 		20000
-#endif		;
+#endif
+		;
 	htim3.Init.ClockDivision			= TIM_CLOCKDIVISION_DIV1;
 	htim3.Init.AutoReloadPreload		= TIM_AUTORELOAD_PRELOAD_DISABLE;
 	  
@@ -144,6 +145,9 @@ static void MX_TIM3_Init(void)
 		Error_Handler();
 
 	if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+		Error_Handler();
+
+	if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
 		Error_Handler();
 	    
 	HAL_TIM_MspPostInit(&htim3);
@@ -221,9 +225,9 @@ int main(void)
 	MX_USART2_UART_Init();
 	
 #if CONTROLLER == CONTROLLER_ESC
-	ESCController 
+	Controllers::ESCController 
 #elif CONTROLLER == CONTROLLER_SERVO
-	ServoController 
+	Controllers::ServoController 
 #endif		
 		controller;
 	if (controller.Initialize() != 0)
@@ -231,12 +235,13 @@ int main(void)
 
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
 	
 	// it needs for ESC controller initialize
 #if CONTROLLER == CONTROLLER_ESC
 	HAL_Delay(startDelayMs);
 #endif
-
+	
 	uint32_t lastToggle = 0;
 	/* Infinite loop */
 	while (1)
@@ -251,14 +256,26 @@ int main(void)
 					? 900
 					: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);		
 #elif CONTROLLER == CONTROLLER_SERVO
-		int value = 0;
-		if (controller.GetRaw(&value))
-			TIM3->CCR2 =
-			    value < 1
-			        ? deviceId == THROTTLE
+		int value[Controllers::UpBitsCount(Controllers::deviceId)];
+		if (controller.GetValue(value))
+		{
+			auto q = value[0];
+			auto w = value[1];
+			
+			TIM3->CCR1 =
+			    value[0] < 1
+			        ? Controllers::deviceId == (unsigned)ServoDevices::Throttle
 						? 950
 						: 1500
-			        : NumericConvertions::RangeTransform<1000, 2000, 1000, 2000>(value);
+			        : NumericConvertions::RangeTransform<1000, 2000, 1000, 2000>(value[0]);
+		
+			if (Controllers::deviceId == (unsigned)ServoDevices::Tail)
+				TIM3->CCR2 =
+				    value[1] < 1
+						? 1500
+						: NumericConvertions::RangeTransform<1000, 2000, 1000, 2000>(value[1]);
+		}
+			
 #endif
 		
 		// ToDo for check by oscilloscope
