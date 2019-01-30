@@ -6,7 +6,7 @@ enum class ServoDevices : unsigned
 	AileronRight	= 0x02,					// AUX2 : Aileron 2
 	Elevator		= 0x04,					// AUX3 : Elevator
 	Rudder			= 0x08,					// AUX4 : Rudder
-	Throttle		= 0x16,					// AUX5 : Throttle
+	Throttle		= 0x10,					// AUX5 : Throttle
 	
 	Size			= 5,
 	

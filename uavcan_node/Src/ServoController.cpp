@@ -198,7 +198,10 @@ void ServoController::StatusCallback(const uavcan::TimerEvent& event) const
 	message.speed				= this->speed; 
 	message.power_rating_pct	= 0.0F;
 
-	this->statusPublisher->broadcast(message);
+	if (this->statusPublisher->broadcast(message) == 0)
+	{
+		// ToDo Error
+	}
 }
 
 void ServoController::ArrayCommandCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::ArrayCommand>& msg)

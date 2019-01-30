@@ -259,9 +259,6 @@ int main(void)
 		int value[Controllers::UpBitsCount(Controllers::deviceId)];
 		if (controller.GetValue(value))
 		{
-			auto q = value[0];
-			auto w = value[1];
-			
 			TIM3->CCR1 =
 			    value[0] < 1
 			        ? Controllers::deviceId == (unsigned)ServoDevices::Throttle
