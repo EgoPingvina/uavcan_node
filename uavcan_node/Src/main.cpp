@@ -18,7 +18,7 @@ TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart2;
 
-void ErrorHandler(const char * file, int line)
+void ErrorHandler(const char * file, int32_t line)
 {
 	// ToDo make a notification about error
 	while (true)
@@ -243,41 +243,44 @@ int main(void)
 #endif
 	
 	uint32_t lastToggle = 0;
+#if CONTROLLER == CONTROLLER_SERVO
+	volatile uint32_t* outputChannels[3]	= { &TIM3->CCR1, &TIM3->CCR2, &TIM3->CCR3 };
+	unsigned deviceCount					= Controllers::UpBitsCount(Controllers::deviceId);
+#endif
 	/* Infinite loop */
 	while (1)
 	{
 		controller.NodeSpin();
 
 #if CONTROLLER == CONTROLLER_ESC
-		int value = 0;
+		int32_t value = 0;
 		if (controller.GetValue(&value))
 			TIM3->CCR2 = TIM3->CCR1 =
 				value < 1
 					? 900
 					: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);		
 #elif CONTROLLER == CONTROLLER_SERVO
-		int value[Controllers::UpBitsCount(Controllers::deviceId)];
+		int32_t value[deviceCount];
 		if (controller.GetValue(value))
 		{
-			TIM3->CCR1 =
-			    value[0] < 1
-			        ? Controllers::deviceId == (unsigned)ServoDevices::Throttle
-						? 950
-						: 1500
-			        : NumericConvertions::RangeTransform<1000, 2000, 1000, 2000>(value[0]);
-		
-			if (Controllers::deviceId == (unsigned)ServoDevices::Tail)
-				TIM3->CCR2 =
-				    value[1] < 1
-						? 1500
-						: NumericConvertions::RangeTransform<1000, 2000, 1000, 2000>(value[1]);
+			for (unsigned i = 0; i < deviceCount; i++)
+				*outputChannels[i] = 
+					value[i] < 1
+						? Controllers::deviceId == (unsigned)ServoDevices::Throttle
+							? 950
+							: 1500
+						: Controllers::deviceId == (unsigned)ServoDevices::Throttle
+							? NumericConvertions::RangeTransform<1000, 2000, 1000, 1780>(value[i])
+							: Controllers::deviceId == (unsigned)ServoDevices::AileronLeft || Controllers::deviceId == (unsigned)ServoDevices::AileronRight
+								? NumericConvertions::RangeTransform<1125, 1875, 1000, 2000>(value[i])
+								: NumericConvertions::RangeTransform<1000, 2000, 1100, 1900>(value[i]);	// tail(rudder & elevator)
 		}
 			
 #endif
 		
 		// ToDo for check by oscilloscope
-//		const unsigned int period = 1000000 / 400;
-//		unsigned int esc_indication = (period / 8) * controller.SelfIndex() ;
+//		const unsigned int32_t period = 1000000 / 400;
+//		unsigned int32_t esc_indication = (period / 8) * controller.SelfIndex() ;
 //		if(esc_indication <= period)
 //			TIM3->CCR3 = esc_indication;
 		

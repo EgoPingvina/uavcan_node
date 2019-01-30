@@ -1,8 +1,5 @@
 #pragma once
 
-#include "ESCDevices.hpp"
-#include "ServoDevices.hpp"
-
 #pragma region Controller info
 
 #define CONTROLLER_ESC		0
@@ -26,15 +23,16 @@
 
 #if CONTROLLER == CONTROLLER_ESC
 	#include "ESCController.hpp"
+	#include "ESCDevices.hpp"
 #elif CONTROLLER == CONTROLLER_SERVO
 	#include "ServoController.hpp"
+	#include "ServoDevices.hpp"
 #endif
 
 #pragma endregion
 
 namespace Controllers
 {
-
 	/// <summary>
 	/// Current device id
 	/// </summary>
@@ -44,7 +42,7 @@ namespace Controllers
 #elif CONTROLLER == CONTROLLER_SERVO
 		ServoDevices::
 #endif
-			Tail;     	// Manually changeable
+			AileronRight;             	// Manually changeable
 
 	/// <summary>
 	/// Real node id in CAN bus

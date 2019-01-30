@@ -35,22 +35,22 @@ namespace Controllers
 	public:
 		ServoController();
 	
-		int Initialize();
+		int32_t Initialize();
 
-		int ConfigureNode();
+		int32_t ConfigureNode();
 
 		/// <summary>
 		/// Spinning for n second.
 		/// The method spin() may return earlier if an error occurs(e.g.driver failure).
 		/// All error codes are listed in the header uavcan / error.hpp.
 		/// </summary>
-		int NodeSpin() const;
+		int32_t NodeSpin() const;
 	
 		unsigned SelfIndex() const;
 	
 		bool IsValueUpdate(void) const;
 	
-		bool GetValue(int* value);
+		bool GetValue(int32_t* value);
 
 	private:	
 		typedef uavcan::MethodBinder<ServoController*,
@@ -61,7 +61,7 @@ namespace Controllers
 			void(ServoController::*)(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::ArrayCommand>&)>
 			    ArrayCommandCallbackBinder;
 
-		static constexpr int rxQueueSize				= 64;
+		static constexpr int32_t rxQueueSize			= 64;
 
 		static constexpr uint32_t bitRate				= 1000000;
 
@@ -80,7 +80,7 @@ namespace Controllers
 	
 		float speed										= 0.0F; 
 	
-		int *value;
+		int32_t *value;
 
 		unsigned selfIndex;
 	

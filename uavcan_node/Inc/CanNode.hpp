@@ -5,7 +5,8 @@
 
 namespace Controllers
 {	
-	#define GetBitValue(number, position) ((number >> position) & 1)
+	#define GetBit(number, position) ((number >> position) & 1)
+	#define SetBit(number, position, value) (number | value << position)
 
 	extern __weak const unsigned deviceId;
 	extern __weak const unsigned nodeId;

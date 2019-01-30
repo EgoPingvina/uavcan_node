@@ -33,12 +33,12 @@ ServoController::ServoController()
 	, paramSpeed("speed", 0, 0, 255)
 	, paramPowerRatingPct("power_rating_pct", 0, 0, 255)
 {
-	this->value = (int*)malloc(this->deviceCount * sizeof(int));
+	this->value = (int32_t*)malloc(this->deviceCount * sizeof(int32_t));
 }
 
-int ServoController::Initialize()
+int32_t ServoController::Initialize()
 {
-	int isOk = 0;
+	int32_t isOk = 0;
 
 	if ((isOk = this->ConfigureNode()) != 0)
 		return isOk;
@@ -75,7 +75,7 @@ int ServoController::Initialize()
 	return isOk;
 }
 
-int ServoController::ConfigureNode()
+int32_t ServoController::ConfigureNode()
 {
 	auto& mynode = this->GetNode();
 
@@ -102,7 +102,7 @@ int ServoController::ConfigureNode()
 	* Start the node.
 	* All returnable error codes are listed in the header file uavcan/error.hpp.
 	*/
-	const int node_start_res = mynode.start();
+	const int32_t node_start_res = mynode.start();
 	if (node_start_res != 0)
 		return node_start_res;
 
@@ -113,7 +113,7 @@ int ServoController::ConfigureNode()
 #pragma region Config
 
 	static os::stm32::ConfigStorageBackend config_storage_backend(configStorageAddress, configStorageSize);
-	const int config_init_res = os::config::init(&config_storage_backend);
+	const int32_t config_init_res = os::config::init(&config_storage_backend);
 
 	if (config_init_res < 0)
 		return -1;
@@ -134,7 +134,7 @@ Node& ServoController::GetNode() const
 	return mynode;
 }	
 
-int ServoController::NodeSpin() const
+int32_t ServoController::NodeSpin() const
 {
 	return this->GetNode().spin(uavcan::MonotonicDuration::fromMSec(100));
 }
@@ -149,13 +149,13 @@ bool ServoController::IsValueUpdate(void) const
 	return this->isValueUpdate;
 }
 	
-bool ServoController::GetValue(int* value)
+bool ServoController::GetValue(int32_t* value)
 {
 	if (!this->IsValueUpdate())
 		return false;
 	
 	this->isValueUpdate = false; 
-	memcpy(value, this->value, this->deviceCount * sizeof(int));
+	memcpy(value, this->value, this->deviceCount * sizeof(int32_t));
 	return true;
 }
 
@@ -216,7 +216,7 @@ void ServoController::ArrayCommandCallback(const uavcan::ReceivedDataStructure<u
 	}
 
 	for (unsigned i = 0, position = 0; i < (unsigned)ServoDevices::Size; i++)
-		if (GetBitValue(deviceId, i) == 1)
+		if (GetBit(deviceId, i) == 1)
 			this->value[position++] = msg.commands[i].command_value;
 	
 	this->isValueUpdate = true;
