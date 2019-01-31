@@ -37,9 +37,10 @@ Node& CanNode::GetNode()
 	return mynode;
 }
 
-int32_t CanNode::NodeSpin() 
+void CanNode::NodeSpin() 
 {
-	return this->GetNode().spin(uavcan::MonotonicDuration::fromMSec(100));
+	if (this->GetNode().spin(uavcan::MonotonicDuration::fromMSec(100)) != 0)
+		this->ErrorHandler(__LINE__);
 }
 	
 unsigned CanNode::SelfIndex() const

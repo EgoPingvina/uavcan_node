@@ -279,10 +279,8 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
 	
-	// it needs for ESC controller initialize
-#if CONTROLLER == CONTROLLER_ESC
+	// wait of uavcan server initialization(paxhawk)
 	HAL_Delay(startDelayMs);
-#endif
 	
 #if CONTROLLER == CONTROLLER_SERVO
 	static constexpr uint32_t deviceCount = NumericConvertions::UpBitsCount(Controllers::deviceId);

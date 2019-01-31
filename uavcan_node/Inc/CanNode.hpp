@@ -42,7 +42,7 @@ namespace Controllers
 		/// The method spin() may return earlier if an error occurs(e.g.driver failure).
 		/// All error codes are listed in the header uavcan / error.hpp.
 		/// </summary>
-		int32_t NodeSpin();
+		void NodeSpin();
 	
 		unsigned SelfIndex() const;
 	
