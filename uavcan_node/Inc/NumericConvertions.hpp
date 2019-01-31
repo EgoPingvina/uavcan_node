@@ -118,7 +118,7 @@ namespace NumericConvertions
 	}
 
 	template<typename T>
-		constexpr inline uint32_t UpBitsCount(T value)
+	constexpr inline uint32_t UpBitsCount(T value)
 	{
 		static_assert(std::is_arithmetic<T>::value, "Argument type isn't arithmethic");
 

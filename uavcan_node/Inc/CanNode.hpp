@@ -1,7 +1,5 @@
 #pragma once
 
-#include "stm32f1xx_hal.h"
-
 #include <uavcan_stm32/uavcan_stm32.hpp>
 
 #include <uavcan/node/node.hpp>
@@ -17,8 +15,8 @@ namespace Controllers
 	#define GetBit(number, position) ((number >> position) & 1)
 	#define SetBit(number, position, value) (number | value << position)
 
-	extern __weak const uint32_t deviceId;
-	extern __weak const uint32_t nodeId;
+	extern const uint32_t deviceId;
+	extern const uint32_t nodeId;
 	
 	/// <summary>
 	/// Memory pool size largely depends on the number of CAN ifaces and on application's logic.

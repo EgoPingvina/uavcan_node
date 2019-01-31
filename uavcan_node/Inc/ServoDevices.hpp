@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 enum class ServoDevices : uint32_t
 {
 	AileronLeft		= 0x01,					// AUX1 : Aileron 1
@@ -13,14 +15,13 @@ enum class ServoDevices : uint32_t
 	Tail			= Rudder | Elevator		// this node has 2 actuators: rudder and elevator
 };
 
-inline ServoDevices operator |(ServoDevices left, ServoDevices right)
+constexpr inline ServoDevices operator |(ServoDevices left, ServoDevices right)
 {
-	return left | right;
-	//using T = std::underlying_type_t <SBJFrameDrag>;
-	//return static_cast<SBJFrameDrag>(static_cast<T>(lhs) | static_cast<T>(rhs));
+	using T = std::underlying_type_t <ServoDevices>;
+	return static_cast<ServoDevices>(static_cast<T>(left) | static_cast<T>(right));
 }
 
-inline ServoDevices& operator |=(ServoDevices& left, ServoDevices right)
+constexpr inline ServoDevices& operator |=(ServoDevices& left, ServoDevices right)
 {
 	left = left | right;
 	return left;

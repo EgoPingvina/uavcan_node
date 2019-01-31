@@ -284,13 +284,14 @@ int main(void)
 	HAL_Delay(startDelayMs);
 #endif
 	
-	uint32_t lastToggle = 0;
 #if CONTROLLER == CONTROLLER_SERVO
-	const uint32_t deviceCount = NumericConvertions::UpBitsCount(Controllers::deviceId);
+	static constexpr uint32_t deviceCount = NumericConvertions::UpBitsCount(Controllers::deviceId);
 	static_assert(deviceCount <= 3, "management of no more than three servos is allowed");
 	
 	volatile uint32_t* outputChannels[3]	= { &TIM3->CCR1, &TIM3->CCR2, &TIM3->CCR3 };
 #endif
+	
+	uint32_t lastToggle = 0;
 	/* Infinite loop */
 	while (1)
 	{

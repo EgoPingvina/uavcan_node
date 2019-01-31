@@ -36,13 +36,13 @@ namespace Controllers
 	/// <summary>
 	/// Current device id
 	/// </summary>
-	const uint32_t deviceId	= (unsigned)
+	const uint32_t deviceId	= (uint32_t)
 #if CONTROLLER == CONTROLLER_ESC
 		ESCDevices::
 #elif CONTROLLER == CONTROLLER_SERVO
 		ServoDevices::
 #endif
-			Throttle;             	// Manually changeable
+			Tail;             	// Manually changeable
 
 	/// <summary>
 	/// Real node id in CAN bus
