@@ -42,7 +42,7 @@ namespace Controllers
 #elif CONTROLLER == CONTROLLER_SERVO
 		ServoDevices::
 #endif
-			AileronRight;             	// Manually changeable
+			Tail;             	// Manually changeable
 
 	/// <summary>
 	/// Real node id in CAN bus

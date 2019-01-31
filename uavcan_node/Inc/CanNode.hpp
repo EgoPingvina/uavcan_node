@@ -1,7 +1,6 @@
 #pragma once
-	
-#include <bitset>
-#include <climits>
+
+#include "NumericConvertions.hpp"
 
 namespace Controllers
 {	
@@ -10,19 +9,10 @@ namespace Controllers
 
 	extern __weak const unsigned deviceId;
 	extern __weak const unsigned nodeId;
-
-	template<typename T>
-	constexpr inline unsigned UpBitsCount(T n)
+	
+	class CanNode
 	{
-		static_assert(std::is_arithmetic<T>::value, "Argument type isn't arithmethic");
-		
-		std::bitset<sizeof(T) * CHAR_BIT> b(n);
-		return b.count();
-	}
-	
-//	class CanNode
-//	{
-//		
-//	};
-	
+	public:
+		//void SetErrorHandler
+	};	
 }

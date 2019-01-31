@@ -25,7 +25,7 @@ using namespace Controllers;
 
 ServoController::ServoController()
 	: configStorageAddress(reinterpret_cast<void*>(0x08000000 + (512 * 1024) - 1024))
-	, deviceCount(UpBitsCount(deviceId))
+	, deviceCount(NumericConvertions::UpBitsCount(deviceId))
 	, paramNodeId("uavcan_node_id", nodeId, 0, 125)
 	, paramActuatorId("actuator_id", deviceId, 0, 15)
 	, paramPosition("position", 0, 0, 360)

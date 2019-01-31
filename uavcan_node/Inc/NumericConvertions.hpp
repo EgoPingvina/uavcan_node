@@ -118,6 +118,18 @@ namespace NumericConvertions
 	}
 
 	template<typename T>
+	constexpr inline unsigned UpBitsCount(T value)
+	{
+		static_assert(std::is_arithmetic<T>::value, "Argument type isn't arithmethic");
+
+		unsigned c = 0;  				// c accumulates the total bits set in v
+		for (c = 0 ; value ; c++)
+			value &= value - 1;  		// clear the least significant bit set
+
+		return c;
+	}
+
+	template<typename T>
 	inline int16_t compose_int16(T a_hbyte, T a_lbyte)
 	{
 		return (static_cast<int16_t>(a_hbyte) << 8U) | (static_cast<uint8_t>(a_lbyte));

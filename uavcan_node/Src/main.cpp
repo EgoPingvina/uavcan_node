@@ -254,8 +254,10 @@ int main(void)
 	
 	uint32_t lastToggle = 0;
 #if CONTROLLER == CONTROLLER_SERVO
+	constexpr unsigned deviceCount = NumericConvertions::UpBitsCount(Controllers::deviceId);
+	static_assert(deviceCount <= 3, "management of no more than three servos is allowed");
+	
 	volatile uint32_t* outputChannels[3]	= { &TIM3->CCR1, &TIM3->CCR2, &TIM3->CCR3 };
-	unsigned deviceCount					= Controllers::UpBitsCount(Controllers::deviceId);
 #endif
 	/* Infinite loop */
 	while (1)
