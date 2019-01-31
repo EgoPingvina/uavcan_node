@@ -8,9 +8,14 @@
 const uint32_t startDelayMs = 5000;
 
 /// <summary>
-/// Period of led blinking(2 times per second)
+/// Period of led blinking(1 times per second)
 /// </summary>
-const uint32_t lifeIndicationPeriod = 500;
+const uint32_t lifeIndicationPeriod = 1000;
+
+/// <summary>
+/// Initialization error hundler period of led blink(5 times per second)
+/// </summary>
+const uint32_t initErrorPeriod = 200;
 
 CAN_HandleTypeDef hcan;
 
@@ -18,13 +23,18 @@ TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart2;
 
+/// <summary>
+/// Initialization error hundler
+/// </summary>
 void ErrorHandler(const char * file, int32_t line)
 {
-	// ToDo make a notification about error
+	uint32_t lastToggle = 0;
 	while (true)
-	{
-
-	}
+		if (HAL_GetTick() >= lastToggle + initErrorPeriod)
+		{
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+			lastToggle = HAL_GetTick();
+		}
 }
 
 /// <summary>
