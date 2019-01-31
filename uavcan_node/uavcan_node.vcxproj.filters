@@ -84,9 +84,6 @@
     <Filter Include="Header files\STM32Cube HAL\GPIO">
       <UniqueIdentifier>{df71064b-9426-4150-9f18-65390d4209e5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header files\Device-specific files">
-      <UniqueIdentifier>{7ce57ea8-350e-4d11-a493-432dca6666ca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="VisualGDB settings">
       <UniqueIdentifier>{dc45df86-a6de-4297-bb4e-7fc832c8dad5}</UniqueIdentifier>
     </Filter>
@@ -122,6 +119,9 @@
     </Filter>
     <Filter Include="Source files\Controllers">
       <UniqueIdentifier>{f1c23200-d8ff-4b1c-bc8c-011cc267f79d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Helpers">
+      <UniqueIdentifier>{c2fd60fa-39b1-4c23-81f5-8ac021f41e12}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -361,9 +361,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Inc\NumericConvertions.hpp">
-      <Filter>Header files</Filter>
-    </ClInclude>
     <ClInclude Include="..\libuavcan\libuavcan\include\uavcan\build_config.hpp">
       <Filter>Header files\uavcan</Filter>
     </ClInclude>
@@ -393,6 +390,12 @@
     </ClInclude>
     <ClInclude Include="Inc\ESCDevices.hpp">
       <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\NumericConvertions.hpp">
+      <Filter>Header files\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CallbackT.h">
+      <Filter>Header files\Helpers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

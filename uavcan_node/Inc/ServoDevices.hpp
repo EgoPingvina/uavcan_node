@@ -1,6 +1,6 @@
 #pragma once
 
-enum class ServoDevices : unsigned
+enum class ServoDevices : uint32_t
 {
 	AileronLeft		= 0x01,					// AUX1 : Aileron 1
 	AileronRight	= 0x02,					// AUX2 : Aileron 2

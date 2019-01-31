@@ -1,6 +1,6 @@
 #pragma once
 
-enum class ESCDevices : unsigned
+enum class ESCDevices : uint32_t
 {
 	RightTop	= 0,
 	LeftTop		= 2,

@@ -30,9 +30,9 @@ ESCController::ESCController()
 #endif
 { }
 
-int ESCController::Initialize()
+int32_t ESCController::Initialize()
 {
-	int isOk = 0;
+	int32_t isOk = 0;
 
 	if ((isOk = this->ConfigureNode()) != 0)
 		return isOk;
@@ -48,7 +48,6 @@ int ESCController::Initialize()
 		return isOk;
 
 #pragma endregion
-
 
 #pragma region Publications initialize
 
@@ -70,7 +69,7 @@ int ESCController::Initialize()
 	return isOk;
 }
 
-int ESCController::ConfigureNode()
+int32_t ESCController::ConfigureNode()
 {
 	auto& mynode = this->GetNode();
 
@@ -97,7 +96,7 @@ int ESCController::ConfigureNode()
 	* Start the node.
 	* All returnable error codes are listed in the header file uavcan/error.hpp.
 	*/
-	const int node_start_res = mynode.start();
+	const int32_t node_start_res = mynode.start();
 	if (node_start_res != 0)
 		return node_start_res;
 
@@ -105,14 +104,14 @@ int ESCController::ConfigureNode()
 	
 #ifdef PARAM_SERVER		
 	// initialization
-	int param_server_res = get_param_server().start(&this->paramManager);
+	int32_t param_server_res = get_param_server().start(&this->paramManager);
 	if (param_server_res < 0)
 		return param_server_res;
 #endif 		
 
 #ifdef ENUMERATION		
 	enumeration_handler_.construct<uavcan::INode&>(mynode);
-	int enumeration_handler_res = enumeration_handler_->start();
+	int32_t enumeration_handler_res = enumeration_handler_->start();
 	if (enumeration_handler_res < 0)
 		return enumeration_handler_res;
 #endif 
@@ -121,7 +120,7 @@ int ESCController::ConfigureNode()
 
 	// Config
 	static os::stm32::ConfigStorageBackend config_storage_backend(configStorageAddress, configStorageSize);
-	const int config_init_res = os::config::init(&config_storage_backend);
+	const int32_t config_init_res = os::config::init(&config_storage_backend);
 
 	if (config_init_res < 0)
 		return -1;
@@ -130,64 +129,15 @@ int ESCController::ConfigureNode()
 
 	return 0;
 }
-
-Node& ESCController::GetNode() const
-{
-	static Node mynode(this->GetCanDriver(), uavcan_stm32::SystemClock::instance());
-	return mynode;
-}	
-
-int ESCController::NodeSpin() const
-{
-	return this->GetNode().spin(uavcan::MonotonicDuration::fromMSec(100));
-}
 	
-unsigned ESCController::SelfIndex() const
+bool ESCController::GetValue(int32_t* value)
 {
-	return this->selfIndex;
-}
-
-bool ESCController::IsRawUpdate(void) const
-{		 
-	return this->isRawUpdate;
-}
-	
-bool ESCController::GetValue(int* raw)
-{
-	if (!this->IsRawUpdate())
+	if (!this->IsValueUpdate())
 		return false;
 		
-	this->isRawUpdate = false; 
-	*raw = this->rawValue; 
+	this->isValueUpdate = false; 
+	*value = this->value; 
 	return true;
-}
-
-UniqueID ESCController::ReadUID() const
-{
-	UniqueID uid;
-
-	// Unique device ID register has address 0x1FFFF7E8
-	std::memcpy(uid.data(), reinterpret_cast<const void*>(0x1FFFF7E8), std::tuple_size<UniqueID>::value);
-
-	return uid;
-}
-
-uavcan::ICanDriver& ESCController::GetCanDriver() const
-{
-	static uavcan_stm32::CanInitHelper<rxQueueSize> can;
-
-	static bool initialized = false;
-
-	if (!initialized)
-	{
-		initialized = true;
-		if (can.init(bitRate) != 0)
-		{
-			// ToDo init error uavcan::ErrDriver;
-		}
-	}
-
-	return can.driver;
 }
 
 void ESCController::StatusCallback(const uavcan::TimerEvent& event) const
@@ -210,13 +160,13 @@ void ESCController::RawCommandCallback(const uavcan::ReceivedDataStructure<uavca
 {
 	if (msg.cmd.size() <= this->selfIndex)
 	{
-		if (!this->IsRawUpdate())
-			this->isRawUpdate = true;
+		if (!this->IsValueUpdate())
+			this->isValueUpdate = true;
 
-		this->rawValue = 0;
+		this->value = 0;
 		return;
 	}
 
-	this->rawValue = msg.cmd[this->selfIndex];
-	this->isRawUpdate = true;
+	this->value = msg.cmd[this->selfIndex];
+	this->isValueUpdate = true;
 }

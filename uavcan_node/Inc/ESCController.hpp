@@ -2,13 +2,10 @@
 
 #include <array>
 
-#include <uavcan_stm32/uavcan_stm32.hpp>
-
 #include <uavcan/equipment/esc/RawCommand.hpp>
 #include <uavcan/equipment/esc/Status.hpp>
 #include <uavcan/node/generic_subscriber.hpp>
 #include <uavcan/node/node.hpp>
-#include <uavcan/node/timer.hpp>
 #include <uavcan/protocol/enumeration/Begin.hpp>
 #include <uavcan/protocol/enumeration/Indication.hpp>
 #include <uavcan/protocol/param_server.hpp>
@@ -27,40 +24,19 @@ namespace Controllers
 	#define SELF_DIR_DEFAULT		1	
 	#define SIM_M_ROTATION_START	(nodeId * 40)
 	#define SIM_M_ROTATION_STOP		(SIM_M_ROTATION_START + 20)
-	
-	/// <summary>
-	/// Memory pool size largely depends on the number of CAN ifaces and on application's logic.
-	/// Please read the documentation for the class uavcan::Node to learn more.
-	/// </summary>
-	static constexpr unsigned nodeMemoryPoolSize = 16384;   // 4KB - 512KB
-	
-	typedef uavcan::Node<nodeMemoryPoolSize> Node;
-	
-	typedef std::array<std::uint8_t, 12> UniqueID;
 
 	CONFIG_PARAM_INT("ctl_dir", SELF_DIR_DEFAULT, 0, 1)
 
-	class ESCController
+	class ESCController : public CanNode
 	{
 	public:
 		ESCController();
 	
-		int Initialize();
+		int32_t Initialize() override;
 
-		int ConfigureNode();
-
-		/// <summary>
-		/// Spinning for n second.
-		/// The method spin() may return earlier if an error occurs(e.g.driver failure).
-		/// All error codes are listed in the header uavcan / error.hpp.
-		/// </summary>
-		int NodeSpin() const;
+		int32_t ConfigureNode() override;
 	
-		unsigned SelfIndex() const;
-	
-		bool IsRawUpdate(void) const;
-	
-		bool GetValue(int* raw);
+		bool GetValue(int32_t* raw) override;
 
 	private:
 		#define ENUMERATION
@@ -74,10 +50,6 @@ namespace Controllers
 			void(ESCController::*)(const uavcan::ReceivedDataStructure<uavcan::equipment::esc::RawCommand>&)>
 			    RawCommandCallbackBinder;
 
-		static constexpr int rxQueueSize				= 64;
-
-		static constexpr uint32_t bitRate				= 1000000;
-
 		static constexpr unsigned configStorageSize		= 1024;
 
 		void* const configStorageAddress;
@@ -85,22 +57,13 @@ namespace Controllers
 		/// <summary>
 		/// Value from CAN for this ESC
 		/// </summary>
-		int rawValue;
+		int32_t value;
 
-		unsigned selfIndex, selfDirection; 
-	
-		bool isRawUpdate = false;
+		unsigned selfIndex, selfDirection;
 	
 		uavcan::Publisher<uavcan::equipment::esc::Status>* statusPublisher;
 
 		os::config::Param<unsigned> paramESCIndex;
-	
-		/// <summary>
-		/// Node object will be constructed at the time of the first access.
-		/// Note that most library objects are noncopyable(e.g.publishers, subscribers, servers, callers, timers, ...).
-		/// Attempt to copy a noncopyable object causes compilation failure.
-		/// </summary>
-		Node& GetNode() const;
 
 		/// <summary>
 		/// Uses by timer for sending Status with some period
@@ -111,21 +74,6 @@ namespace Controllers
 		/// Callback of new RawCommand package
 		/// </summary>
 		void RawCommandCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::esc::RawCommand>& msg);
-
-		UniqueID ReadUID() const;
-
-		uavcan::ICanDriver& GetCanDriver() const;
-	
-		/// <summary>
-		/// Restart handler
-		/// </summary>
-		class RestartRequestHandler : public uavcan::IRestartRequestHandler
-		{
-			bool handleRestartRequest(uavcan::NodeID request_source) override
-			{
-				return true;
-			}
-		} restart_request_handler;
 
 		#ifdef PARAM_SERVER
 
@@ -214,7 +162,7 @@ namespace Controllers
 			void readParamValue(const Name& name, Value& out_value) const override
 			{
 				ConfigParam descr;
-				const int isOk = configGetDescr(name.c_str(), &descr);
+				const int32_t isOk = configGetDescr(name.c_str(), &descr);
 				if (isOk >= 0)
 				{
 					convert(configGet(name.c_str()), descr.type, out_value);
@@ -230,7 +178,7 @@ namespace Controllers
 			void readParamDefaultMaxMin(const Name& name, Value& out_default, NumericValue& out_max, NumericValue& out_min) const override
 			{
 				ConfigParam descr;
-				const int isOk = configGetDescr(name.c_str(), &descr);
+				const int32_t isOk = configGetDescr(name.c_str(), &descr);
 				if (isOk >= 0)
 				{
 					convert(descr.default_, descr.type, out_default);
@@ -260,7 +208,7 @@ namespace Controllers
 		*/
 		class EnumerationHandler : public uavcan::TimerBase
 		{
-			static constexpr int CONFIRMATION_CHECK_INTERVAL_MSEC = 50;
+			static constexpr int32_t CONFIRMATION_CHECK_INTERVAL_MSEC = 50;
 
 			typedef uavcan::MethodBinder<EnumerationHandler*,
 				void(EnumerationHandler::*)
@@ -298,7 +246,7 @@ namespace Controllers
 			
 				#pragma region user motors numbering simulation
 			
-				static int cnt = 0;
+				static int32_t cnt = 0;
 				cnt++;
 				
 				if (!(cnt > SIM_M_ROTATION_START && cnt < SIM_M_ROTATION_STOP))
@@ -306,7 +254,7 @@ namespace Controllers
 			
 					#pragma endregion
 				
-				int rotation;
+				int32_t rotation;
 				
 				if (nodeId == 1 || nodeId == 2)
 					rotation = MOTOR_FORCED_ROTATION_FORWARD;
@@ -362,7 +310,7 @@ namespace Controllers
 				, pub_(node)
 			{}
 
-			int start()
+			int32_t start()
 			{
 				return srv_.start(CallbackBinder(this, &EnumerationHandler::handleBegin));
 			}

@@ -44,7 +44,7 @@
       <AdditionalIncludeDirectories>../dsdlc_g;../libuavcan/libuavcan/include;../libuavcan/libuavcan_drivers/stm32/driver/include;Drivers\CMSIS\Device\ST\STM32F1xx\Include;Drivers/CMSIS/Include;Inc;Drivers\STM32F1xx_HAL_Driver\Inc;Drivers\STM32F1xx_HAL_Driver\Inc\Legacy;Drivers\STM32F1xx_HAL_Driver\Src;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>flash_layout;STM32F103xE;DEBUG=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions />
-      <CLanguageStandard />
+      <CLanguageStandard>C11</CLanguageStandard>
       <CPPLanguageStandard>GNUPP14</CPPLanguageStandard>
     </ClCompile>
     <Link>
@@ -130,6 +130,7 @@
     <ClCompile Include="Src\ESCController.cpp" />
     <ClInclude Include="..\libuavcan\libuavcan\include\uavcan\build_config.hpp" />
     <ClInclude Include="..\libuavcan\libuavcan_drivers\stm32\driver\include\uavcan_stm32\build_config.hpp" />
+    <ClInclude Include="Inc\CallbackT.h" />
     <ClInclude Include="Inc\CanNode.hpp" />
     <ClInclude Include="Inc\chip.h" />
     <ClInclude Include="Inc\Config.hpp" />

@@ -24,7 +24,7 @@ TIM_HandleTypeDef htim3;
 UART_HandleTypeDef huart2;
 
 /// <summary>
-/// Initialization error hundler
+/// Initialization error handler
 /// </summary>
 void ErrorHandler(const char * file, int32_t line)
 {
@@ -35,6 +35,34 @@ void ErrorHandler(const char * file, int32_t line)
 			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
 			lastToggle = HAL_GetTick();
 		}
+}
+
+/// <summary>
+/// Node error handler
+/// </summary>
+static void NodeErrorHandler(int32_t line)
+{
+	const uint32_t longTick = 1000, shortTick = 200;
+	
+	uint32_t lastToggle = 0, tickNumber = 0;
+	while (true)
+		if (tickNumber >= 4)
+		{
+			if (HAL_GetTick() >= lastToggle + longTick)
+			{
+				HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+				lastToggle = HAL_GetTick();
+				
+				tickNumber = tickNumber == 4 ? tickNumber + 1 : 0;
+			}
+		}
+		else if (HAL_GetTick() >= lastToggle + shortTick)
+			{
+				HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+				lastToggle = HAL_GetTick();
+				
+				tickNumber++;
+			}
 }
 
 /// <summary>
@@ -240,8 +268,12 @@ int main(void)
 	Controllers::ServoController 
 #endif		
 		controller;
+	
 	if (controller.Initialize() != 0)
-		Error_Handler();
+		NodeErrorHandler(__LINE__);
+	
+	// attach error handler
+	controller.SetErrorHandler(NodeErrorHandler);
 
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
@@ -254,7 +286,7 @@ int main(void)
 	
 	uint32_t lastToggle = 0;
 #if CONTROLLER == CONTROLLER_SERVO
-	constexpr unsigned deviceCount = NumericConvertions::UpBitsCount(Controllers::deviceId);
+	const uint32_t deviceCount = NumericConvertions::UpBitsCount(Controllers::deviceId);
 	static_assert(deviceCount <= 3, "management of no more than three servos is allowed");
 	
 	volatile uint32_t* outputChannels[3]	= { &TIM3->CCR1, &TIM3->CCR2, &TIM3->CCR3 };
@@ -275,15 +307,15 @@ int main(void)
 		int32_t value[deviceCount];
 		if (controller.GetValue(value))
 		{
-			for (unsigned i = 0; i < deviceCount; i++)
+			for (uint32_t i = 0; i < deviceCount; i++)
 				*outputChannels[i] = 
 					value[i] < 1
-						? Controllers::deviceId == (unsigned)ServoDevices::Throttle
+						? Controllers::deviceId == (uint32_t)ServoDevices::Throttle
 							? 950
 							: 1500
-						: Controllers::deviceId == (unsigned)ServoDevices::Throttle
+						: Controllers::deviceId == (uint32_t)ServoDevices::Throttle
 							? NumericConvertions::RangeTransform<1000, 2000, 1000, 1780>(value[i])
-							: Controllers::deviceId == (unsigned)ServoDevices::AileronLeft || Controllers::deviceId == (unsigned)ServoDevices::AileronRight
+							: Controllers::deviceId == (uint32_t)ServoDevices::AileronLeft || Controllers::deviceId == (uint32_t)ServoDevices::AileronRight
 								? NumericConvertions::RangeTransform<1125, 1875, 1000, 2000>(value[i])
 								: NumericConvertions::RangeTransform<1000, 2000, 1100, 1900>(value[i]);	// tail(rudder & elevator)
 		}
@@ -291,8 +323,8 @@ int main(void)
 #endif
 		
 		// ToDo for check by oscilloscope
-//		const unsigned int32_t period = 1000000 / 400;
-//		unsigned int32_t esc_indication = (period / 8) * controller.SelfIndex() ;
+//		const uint32_t int32_t period = 1000000 / 400;
+//		uint32_t int32_t esc_indication = (period / 8) * controller.SelfIndex() ;
 //		if(esc_indication <= period)
 //			TIM3->CCR3 = esc_indication;
 		

@@ -127,27 +127,6 @@ int32_t ServoController::ConfigureNode()
 
 	return 0;
 }
-
-Node& ServoController::GetNode() const
-{
-	static Node mynode(this->GetCanDriver(), uavcan_stm32::SystemClock::instance());
-	return mynode;
-}	
-
-int32_t ServoController::NodeSpin() const
-{
-	return this->GetNode().spin(uavcan::MonotonicDuration::fromMSec(100));
-}
-	
-unsigned ServoController::SelfIndex() const
-{
-	return this->selfIndex;
-}
-
-bool ServoController::IsValueUpdate(void) const
-{		 
-	return this->isValueUpdate;
-}
 	
 bool ServoController::GetValue(int32_t* value)
 {
@@ -159,35 +138,7 @@ bool ServoController::GetValue(int32_t* value)
 	return true;
 }
 
-UniqueID ServoController::ReadUID() const
-{
-	UniqueID uid;
-
-	// Unique device ID register has address 0x1FFFF7E8
-	std::memcpy(uid.data(), reinterpret_cast<const void*>(0x1FFFF7E8), std::tuple_size<UniqueID>::value);
-
-	return uid;
-}
-
-uavcan::ICanDriver& ServoController::GetCanDriver() const
-{
-	static uavcan_stm32::CanInitHelper<rxQueueSize> can;
-
-	static bool initialized = false;
-
-	if (!initialized)
-	{
-		initialized = true;
-		if (can.init(bitRate) != 0)
-		{
-			// ToDo init error uavcan::ErrDriver;
-		}
-	}
-
-	return can.driver;
-}
-
-void ServoController::StatusCallback(const uavcan::TimerEvent& event) const
+void ServoController::StatusCallback(const uavcan::TimerEvent& event)
 {
 	uavcan::equipment::actuator::Status message;
 
@@ -199,9 +150,7 @@ void ServoController::StatusCallback(const uavcan::TimerEvent& event) const
 	message.power_rating_pct	= 0.0F;
 
 	if (this->statusPublisher->broadcast(message) == 0)
-	{
-		// ToDo Error
-	}
+		this->ErrorHandler(__LINE__);
 }
 
 void ServoController::ArrayCommandCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::ArrayCommand>& msg)
