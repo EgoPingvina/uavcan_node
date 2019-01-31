@@ -60,4 +60,3 @@ ipch/
 *.rsp
 *.elf
 *.bin
-libuavcan
