@@ -46,7 +46,7 @@ void ServoController::Initialize()
 	statusSender.setCallback(
 		StatusCallbackBinder(
 			this,
-		&ServoController::StatusCallback));
+			&ServoController::StatusCallback));
 	
 	statusSender.startPeriodic(uavcan::MonotonicDuration::fromMSec(100));   	// 10Hz
 

@@ -125,7 +125,7 @@ void ESCController::StatusCallback(const uavcan::TimerEvent& event)
 	message.power_rating_pct	= static_cast<unsigned>(.5F * 100 + 0.5F);
 	message.error_count			= 0;
 
-	if (this->statusPublisher->broadcast(message) <= 0)
+	if (this->statusPublisher->broadcast(message) < 0)
 		this->ErrorHandler(__LINE__);
 }
 

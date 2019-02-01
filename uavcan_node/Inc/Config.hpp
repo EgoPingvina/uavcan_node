@@ -9,8 +9,8 @@
 
 #pragma region Id offsets
 
-#define ESC_ID_OFFSET		0
-#define SERVO_ID_OFFSET		8
+#define ESC_ID_OFFSET		1
+#define SERVO_ID_OFFSET		9
 
 #pragma endregion
 
