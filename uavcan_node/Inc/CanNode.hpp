@@ -2,8 +2,6 @@
 
 #include <uavcan_stm32/uavcan_stm32.hpp>
 
-#include <uavcan/node/node.hpp>
-
 #include "CallbackT.h"
 #include "NumericConvertions.hpp"
 
@@ -31,9 +29,9 @@ namespace Controllers
 	class CanNode
 	{
 	public:
-		virtual int32_t Initialize() = 0;
+		virtual void Initialize() = 0;
 
-		virtual int32_t ConfigureNode() = 0;
+		virtual void ConfigureNode() = 0;
 	
 		virtual bool GetValue(int32_t* value) = 0;
 		

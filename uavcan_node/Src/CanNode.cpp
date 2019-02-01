@@ -21,11 +21,8 @@ uavcan::ICanDriver& CanNode::GetCanDriver()
 	if (!initialized)
 	{
 		initialized = true;
-		if (can.init(bitRate) != 0)
-		{
-			// ToDo init error uavcan::ErrDriver;
+		if (can.init(bitRate) < 0)
 			this->ErrorHandler(__LINE__);
-		}
 	}
 
 	return can.driver;
@@ -39,7 +36,7 @@ Node& CanNode::GetNode()
 
 void CanNode::NodeSpin() 
 {
-	if (this->GetNode().spin(uavcan::MonotonicDuration::fromMSec(100)) != 0)
+	if (this->GetNode().spin(uavcan::MonotonicDuration::fromMSec(100)) < 0)
 		this->ErrorHandler(__LINE__);
 }
 	

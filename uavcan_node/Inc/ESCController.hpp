@@ -1,18 +1,11 @@
 #pragma once
 
-#include <array>
-
 #include <uavcan/equipment/esc/RawCommand.hpp>
 #include <uavcan/equipment/esc/Status.hpp>
-#include <uavcan/node/generic_subscriber.hpp>
-#include <uavcan/node/node.hpp>
 #include <uavcan/protocol/enumeration/Begin.hpp>
 #include <uavcan/protocol/enumeration/Indication.hpp>
 #include <uavcan/protocol/param_server.hpp>
-#include <uavcan/protocol/param/Value.hpp>
-#include <uavcan/util/method_binder.hpp>
 
-#include <config/config.hpp>
 #include <config/config_storage.hpp>
 
 #include "CanNode.hpp"
@@ -32,9 +25,9 @@ namespace Controllers
 	public:
 		ESCController();
 	
-		int32_t Initialize() override;
+		void Initialize() override;
 
-		int32_t ConfigureNode() override;
+		void ConfigureNode() override;
 	
 		bool GetValue(int32_t* raw) override;
 
@@ -43,7 +36,7 @@ namespace Controllers
 		#define PARAM_SERVER
 	
 		typedef uavcan::MethodBinder<ESCController*,
-			void(ESCController::*)(const uavcan::TimerEvent&) const>
+			void(ESCController::*)(const uavcan::TimerEvent&)>
 			    StatusCallbackBinder;
 	
 		typedef uavcan::MethodBinder<ESCController*,
@@ -68,7 +61,7 @@ namespace Controllers
 		/// <summary>
 		/// Uses by timer for sending Status with some period
 		/// </summary>
-		void StatusCallback(const uavcan::TimerEvent& event) const;
+		void StatusCallback(const uavcan::TimerEvent& event);
 	
 		/// <summary>
 		/// Callback of new RawCommand package

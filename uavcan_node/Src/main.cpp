@@ -269,8 +269,7 @@ int main(void)
 #endif		
 		controller;
 	
-	if (controller.Initialize() != 0)
-		NodeErrorHandler(__LINE__);
+	controller.Initialize();
 	
 	// attach error handler
 	controller.SetErrorHandler(NodeErrorHandler);
@@ -286,7 +285,7 @@ int main(void)
 	static constexpr uint32_t deviceCount = NumericConvertions::UpBitsCount(Controllers::deviceId);
 	static_assert(deviceCount <= 3, "management of no more than three servos is allowed");
 	
-	volatile uint32_t* outputChannels[3]	= { &TIM3->CCR1, &TIM3->CCR2, &TIM3->CCR3 };
+	volatile uint32_t* outputChannels[3] = { &TIM3->CCR1, &TIM3->CCR2, &TIM3->CCR3 };
 #endif
 	
 	uint32_t lastToggle = 0;
@@ -320,12 +319,6 @@ int main(void)
 		}
 			
 #endif
-		
-		// ToDo for check by oscilloscope
-//		const uint32_t int32_t period = 1000000 / 400;
-//		uint32_t int32_t esc_indication = (period / 8) * controller.SelfIndex() ;
-//		if(esc_indication <= period)
-//			TIM3->CCR3 = esc_indication;
 		
 		// life indication
 		if (HAL_GetTick() >= lastToggle + lifeIndicationPeriod)

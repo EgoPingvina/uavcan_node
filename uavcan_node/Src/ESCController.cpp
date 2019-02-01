@@ -1,23 +1,3 @@
-#include "stm32f1xx_hal.h"
-
-#include <iostream>
-#include <cstdlib>
-#include <unistd.h>
-#include <uavcan/protocol/dynamic_node_id_client.hpp>
-#include <uavcan/protocol/HardwareVersion.hpp>
-#include <uavcan/protocol/dynamic_node_id/Allocation.hpp>
-#include <uavcan/protocol/enumeration/Begin.hpp>
-#include <uavcan/protocol/GetNodeInfo.hpp>
-#include <uavcan/protocol/GetDataTypeInfo.hpp>
-#include <uavcan/protocol/GetTransportStats.hpp>
-#include <uavcan/protocol/RestartNode.hpp>
-#include <uavcan/protocol/file/BeginFirmwareUpdate.hpp>
-#include <uavcan/protocol/GetNodeInfo.hpp>
-#include <uavcan/uavcan.hpp>
-#include <uavcan_stm32/can.hpp>
-#include <uavcan_stm32/bxcan.hpp>
-#include <uavcan/error.hpp>
-
 #include "ESCController.hpp"
 
 using namespace Controllers;
@@ -30,12 +10,11 @@ ESCController::ESCController()
 #endif
 { }
 
-int32_t ESCController::Initialize()
+void ESCController::Initialize()
 {
-	int32_t isOk = 0;
+	this->ConfigureNode();
 
-	if ((isOk = this->ConfigureNode()) != 0)
-		return isOk;
+	int32_t isOk = 0;
 
 #pragma region Subscription initialize
 	
@@ -44,8 +23,8 @@ int32_t ESCController::Initialize()
 		RawCommandCallbackBinder(
 			this,
 			&ESCController::RawCommandCallback));	
-	if (isOk != 0)
-		return isOk;
+	if (isOk < 0)
+		this->ErrorHandler(__LINE__);
 
 #pragma endregion
 
@@ -56,24 +35,24 @@ int32_t ESCController::Initialize()
 	this->statusPublisher = new uavcan::Publisher<uavcan::equipment::esc::Status>(this->GetNode());
 	isOk = this->statusPublisher->init();
 	if (isOk != 0)
-		return isOk;
+		this->ErrorHandler(__LINE__);
 	
 	statusSender.setCallback(
 		StatusCallbackBinder(
 			this,
 			&ESCController::StatusCallback));
+	
 	statusSender.startPeriodic(uavcan::MonotonicDuration::fromMSec(100));  	// 10Hz
 
 #pragma endregion
-
-	return isOk;
 }
 
-int32_t ESCController::ConfigureNode()
+void ESCController::ConfigureNode()
 {
 	auto& mynode = this->GetNode();
 
-	mynode.setNodeID(nodeId);
+	if (!mynode.setNodeID(nodeId))
+		this->ErrorHandler(__LINE__);
 
 	mynode.setName(NODE_NAME);
 
@@ -96,38 +75,31 @@ int32_t ESCController::ConfigureNode()
 	* Start the node.
 	* All returnable error codes are listed in the header file uavcan/error.hpp.
 	*/
-	const int32_t node_start_res = mynode.start();
-	if (node_start_res != 0)
-		return node_start_res;
+	if (mynode.start() < 0)
+		this->ErrorHandler(__LINE__);
 
 	mynode.setRestartRequestHandler(&restart_request_handler);
 	
 #ifdef PARAM_SERVER		
 	// initialization
-	int32_t param_server_res = get_param_server().start(&this->paramManager);
-	if (param_server_res < 0)
-		return param_server_res;
+	if (get_param_server().start(&this->paramManager) < 0)
+		this->ErrorHandler(__LINE__);
 #endif 		
 
 #ifdef ENUMERATION		
 	enumeration_handler_.construct<uavcan::INode&>(mynode);
-	int32_t enumeration_handler_res = enumeration_handler_->start();
-	if (enumeration_handler_res < 0)
-		return enumeration_handler_res;
+	if (enumeration_handler_->start() < 0)
+		this->ErrorHandler(__LINE__);
 #endif 
 
 	mynode.setModeOperational();
 
 	// Config
 	static os::stm32::ConfigStorageBackend config_storage_backend(configStorageAddress, configStorageSize);
-	const int32_t config_init_res = os::config::init(&config_storage_backend);
-
-	if (config_init_res < 0)
-		return -1;
+	if (os::config::init(&config_storage_backend) < 0)
+		this->ErrorHandler(__LINE__);
 
 	this->selfIndex = this->paramESCIndex.get();
-
-	return 0;
 }
 	
 bool ESCController::GetValue(int32_t* value)
@@ -140,7 +112,7 @@ bool ESCController::GetValue(int32_t* value)
 	return true;
 }
 
-void ESCController::StatusCallback(const uavcan::TimerEvent& event) const
+void ESCController::StatusCallback(const uavcan::TimerEvent& event)
 {
 	uavcan::equipment::esc::Status message;
 
@@ -153,7 +125,8 @@ void ESCController::StatusCallback(const uavcan::TimerEvent& event) const
 	message.power_rating_pct	= static_cast<unsigned>(.5F * 100 + 0.5F);
 	message.error_count			= 0;
 
-	this->statusPublisher->broadcast(message);
+	if (this->statusPublisher->broadcast(message) <= 0)
+		this->ErrorHandler(__LINE__);
 }
 
 void ESCController::RawCommandCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::esc::RawCommand>& msg)

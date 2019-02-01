@@ -1,24 +1,4 @@
-﻿#include "stm32f1xx_hal.h"
-
-#include <iostream>
-#include <cstdlib>
-#include <unistd.h>
-#include <uavcan/protocol/dynamic_node_id_client.hpp>
-#include <uavcan/protocol/HardwareVersion.hpp>
-#include <uavcan/protocol/dynamic_node_id/Allocation.hpp>
-#include <uavcan/protocol/enumeration/Begin.hpp>
-#include <uavcan/protocol/GetNodeInfo.hpp>
-#include <uavcan/protocol/GetDataTypeInfo.hpp>
-#include <uavcan/protocol/GetTransportStats.hpp>
-#include <uavcan/protocol/RestartNode.hpp>
-#include <uavcan/protocol/file/BeginFirmwareUpdate.hpp>
-#include <uavcan/protocol/GetNodeInfo.hpp>
-#include <uavcan/uavcan.hpp>
-#include <uavcan_stm32/can.hpp>
-#include <uavcan_stm32/bxcan.hpp>
-#include <uavcan/error.hpp>
-
-#include "ServoController.hpp"
+﻿#include "ServoController.hpp"
 #include "ServoDevices.hpp"
 
 using namespace Controllers;
@@ -36,13 +16,12 @@ ServoController::ServoController()
 	this->value = (int32_t*)malloc(this->deviceCount * sizeof(int32_t));
 }
 
-int32_t ServoController::Initialize()
+void ServoController::Initialize()
 {
+	this->ConfigureNode();
+
 	int32_t isOk = 0;
-
-	if ((isOk = this->ConfigureNode()) != 0)
-		return isOk;
-
+	
 #pragma region Subscription initialize
 	
 	static uavcan::Subscriber<uavcan::equipment::actuator::ArrayCommand> rawSubscriber(this->GetNode());
@@ -50,8 +29,8 @@ int32_t ServoController::Initialize()
 		ArrayCommandCallbackBinder(
 			this,
 			&ServoController::ArrayCommandCallback));	
-	if (isOk != 0)
-		return isOk;
+	if (isOk < 0)
+		this->ErrorHandler(__LINE__);
 
 #pragma endregion
 
@@ -62,24 +41,24 @@ int32_t ServoController::Initialize()
 	this->statusPublisher = new uavcan::Publisher<uavcan::equipment::actuator::Status>(this->GetNode());
 	isOk = this->statusPublisher->init();
 	if (isOk != 0)
-		return isOk;
+		this->ErrorHandler(__LINE__);
 	
 	statusSender.setCallback(
 		StatusCallbackBinder(
 			this,
 		&ServoController::StatusCallback));
+	
 	statusSender.startPeriodic(uavcan::MonotonicDuration::fromMSec(100));   	// 10Hz
 
 #pragma endregion
-
-	return isOk;
 }
 
-int32_t ServoController::ConfigureNode()
+void ServoController::ConfigureNode()
 {
 	auto& mynode = this->GetNode();
 
-	mynode.setNodeID(nodeId);
+	if (!mynode.setNodeID(nodeId))
+		this->ErrorHandler(__LINE__);
 
 	mynode.setName(NODE_NAME);
 
@@ -102,9 +81,8 @@ int32_t ServoController::ConfigureNode()
 	* Start the node.
 	* All returnable error codes are listed in the header file uavcan/error.hpp.
 	*/
-	const int32_t node_start_res = mynode.start();
-	if (node_start_res != 0)
-		return node_start_res;
+	if (mynode.start() < 0)		
+		this->ErrorHandler(__LINE__);
 
 	mynode.setRestartRequestHandler(&restart_request_handler);
 
@@ -113,10 +91,8 @@ int32_t ServoController::ConfigureNode()
 #pragma region Config
 
 	static os::stm32::ConfigStorageBackend config_storage_backend(configStorageAddress, configStorageSize);
-	const int32_t config_init_res = os::config::init(&config_storage_backend);
-
-	if (config_init_res < 0)
-		return -1;
+	if (os::config::init(&config_storage_backend) < 0)
+		this->ErrorHandler(__LINE__);
 
 	this->selfIndex = this->paramActuatorId.get();
 	this->position	= this->paramPosition.get();
@@ -124,8 +100,6 @@ int32_t ServoController::ConfigureNode()
 	this->speed		= this->paramSpeed.get();
 	
 #pragma endregion
-
-	return 0;
 }
 	
 bool ServoController::GetValue(int32_t* value)
@@ -149,7 +123,7 @@ void ServoController::StatusCallback(const uavcan::TimerEvent& event)
 	message.speed				= this->speed; 
 	message.power_rating_pct	= 0.0F;
 
-	if (this->statusPublisher->broadcast(message) == 0)
+	if (this->statusPublisher->broadcast(message) < 0)
 		this->ErrorHandler(__LINE__);
 }
 

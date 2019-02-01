@@ -1,14 +1,8 @@
 #pragma once
 
-#include <array>
-
 #include <uavcan/equipment/actuator/ArrayCommand.hpp>
 #include <uavcan/equipment/actuator/Status.hpp>
-#include <uavcan/node/generic_subscriber.hpp>
-#include <uavcan/node/timer.hpp>
-#include <uavcan/util/method_binder.hpp>
 
-#include <config/config.hpp>
 #include <config/config_storage.hpp>
 
 #include "CanNode.hpp"
@@ -22,9 +16,9 @@ namespace Controllers
 	public:
 		ServoController();
 	
-		int32_t Initialize() override;
+		void Initialize() override;
 
-		int32_t ConfigureNode() override;
+		void ConfigureNode() override;
 	
 		bool GetValue(int32_t* value) override;
 
