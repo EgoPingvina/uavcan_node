@@ -3,11 +3,6 @@
 #include "Config.hpp"
 
 /// <summary>
-/// Delay to initialize pwm motor controller
-/// </summary>
-const uint32_t startDelayMs = 5000;
-
-/// <summary>
 /// Period of led blinking(1 times per second)
 /// </summary>
 const uint32_t lifeIndicationPeriod = 1000;
@@ -309,13 +304,13 @@ int main(void)
 				*outputChannels[i] = 
 					value[i] < 1
 						? Controllers::deviceId == (uint32_t)ServoDevices::Throttle
-							? 950
-							: 1500
+							? 950		// default value for main engine - idling
+							: 1500		// default value for actuators - middle position
 						: Controllers::deviceId == (uint32_t)ServoDevices::Throttle
-							? NumericConvertions::RangeTransform<1000, 2000, 1000, 1780>(value[i])
+							? NumericConvertions::RangeTransform<1000, 2000, 1000, 1780>(value[i])			// throttle
 							: Controllers::deviceId == (uint32_t)ServoDevices::AileronLeft || Controllers::deviceId == (uint32_t)ServoDevices::AileronRight
-								? NumericConvertions::RangeTransform<1125, 1875, 1000, 2000>(value[i])
-								: NumericConvertions::RangeTransform<1000, 2000, 1100, 1900>(value[i]);	// tail(rudder & elevator)
+								? NumericConvertions::RangeTransform<1125, 1875, 1000, 2000>(value[i])		// ailerons
+								: NumericConvertions::RangeTransform<1000, 2000, 1100, 1900>(value[i]);		// tail(rudder & elevator)
 		}
 			
 #endif

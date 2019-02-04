@@ -42,10 +42,15 @@ namespace Controllers
 #elif CONTROLLER == CONTROLLER_SERVO
 		ServoDevices::
 #endif
-			Tail;             	// Manually changeable
+			Throttle;             	// Manually changeable
 
 	/// <summary>
 	/// Real node id in CAN bus
 	/// </summary>
 	const uint32_t nodeId	= (deviceId + (CONTROLLER == CONTROLLER_ESC ? ESC_ID_OFFSET : SERVO_ID_OFFSET));
 }
+
+/// <summary>
+/// Delay before can node initialization
+/// </summary>
+const uint32_t startDelayMs = 5000;			// Manually changeable
