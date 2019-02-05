@@ -30,6 +30,8 @@ namespace Controllers
 		void ConfigureNode() override;
 	
 		bool GetValue(int32_t* raw) override;
+		
+		inline void Output() override;
 
 	private:
 		#define ENUMERATION

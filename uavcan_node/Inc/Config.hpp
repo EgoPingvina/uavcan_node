@@ -4,6 +4,7 @@
 
 #define CONTROLLER_ESC		0
 #define CONTROLLER_SERVO	1
+#define MARSHAL_ENGINE		2
 
 #pragma endregion
 
@@ -17,7 +18,7 @@
 /// <summary>
 /// Current node firmware
 /// </summary>
-#define CONTROLLER			CONTROLLER_SERVO	// Manually changeable
+#define CONTROLLER			MARSHAL_ENGINE	// Manually changeable
 
 #pragma region Including of specified controller
 
@@ -26,6 +27,8 @@
 	#include "ESCDevices.hpp"
 #elif CONTROLLER == CONTROLLER_SERVO
 	#include "ServoController.hpp"
+	#include "ServoDevices.hpp"
+#elif CONTROLLER == MARSHAL_ENGINE
 	#include "ServoDevices.hpp"
 	#include "MarshalEngine.hpp"
 #endif
@@ -38,12 +41,16 @@ namespace Controllers
 	/// Current device id
 	/// </summary>
 	const uint32_t deviceId	= (uint32_t)
-#if CONTROLLER == CONTROLLER_ESC
-		ESCDevices::
-#elif CONTROLLER == CONTROLLER_SERVO
-		ServoDevices::
+#if CONTROLLER == MARSHAL_ENGINE
+		ServoDevices::Throttle;
+#else
+	#if CONTROLLER == CONTROLLER_ESC
+			ESCDevices::
+	#elif CONTROLLER == CONTROLLER_SERVO
+			ServoDevices::
+	#endif
+				AileronLeft;             	// Manually changeable
 #endif
-			Throttle;             	// Manually changeable
 
 	/// <summary>
 	/// Real node id in CAN bus

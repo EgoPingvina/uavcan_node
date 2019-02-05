@@ -30,17 +30,10 @@ namespace Controllers
 	{
 	public:
 		virtual void Initialize() = 0;
-
-		virtual void ConfigureNode() = 0;
 	
 		virtual bool GetValue(int32_t* value) = 0;
 		
-		/// <summary>
-		/// Spinning for n second.
-		/// The method spin() may return earlier if an error occurs(e.g.driver failure).
-		/// All error codes are listed in the header uavcan / error.hpp.
-		/// </summary>
-		void NodeSpin();
+		void OnStep();
 	
 		unsigned SelfIndex() const;
 	
@@ -55,6 +48,10 @@ namespace Controllers
 		unsigned selfIndex;
 		
 		bool isValueUpdate = false;
+
+		virtual void ConfigureNode() = 0;
+		
+		virtual inline void Output() = 0;
 		
 		UniqueID ReadUID() const;
 
@@ -90,6 +87,13 @@ namespace Controllers
 		static constexpr uint32_t bitRate				= 1000000;
 		
 		Action<int32_t> errorHandler;
+		
+		/// <summary>
+		/// Spinning for n second.
+		/// The method spin() may return earlier if an error occurs(e.g.driver failure).
+		/// All error codes are listed in the header uavcan / error.hpp.
+		/// </summary>
+		void NodeSpin();
 	};	
 }
 

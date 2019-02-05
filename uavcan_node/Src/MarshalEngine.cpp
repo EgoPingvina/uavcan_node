@@ -3,14 +3,20 @@
 using namespace Controllers;
 
 MarshalEngine::MarshalEngine()
-	: defaultThrottle(950)
+	: ServoController()
+	, defaultThrottle(950)
 	, throttleValue(defaultThrottle)
 	, ignitionValue(false)
 	, wasStopped(false)
-{	
+{ }
+
+void MarshalEngine::Initialize()
+{
 	int32_t isOk = 0;
 	
-	static uavcan::Subscriber<uavcan::equipment::actuator::Command> arrayCommandSubscriber(this->GetNode());
+	ServoController::Initialize();
+	
+	static uavcan::Subscriber<uavcan::equipment::actuator::Command> arrayCommandSubscriber(ServoController::GetNode());
 	isOk = arrayCommandSubscriber.start(
 		IgnitionCallbackBinder(
 			this,
@@ -18,10 +24,10 @@ MarshalEngine::MarshalEngine()
 	if (isOk < 0)
 		this->ErrorHandler(__LINE__);
 }
-		
+
 int32_t MarshalEngine::Throttle()
 {
-	this->GetValue(&this->throttleValue);
+	ServoController::GetValue(&this->throttleValue);
 	return this->throttleValue;
 }
 		
@@ -30,9 +36,11 @@ bool MarshalEngine::Ignition() const
 	return !this->wasStopped && this->ignitionValue;
 }
 
-void MarshalEngine::OnStep()
+void MarshalEngine::Output()
 {
-	HAL_Delay(20);
+	//HAL_Delay(10);	// if more inertia is needed
+	if (!this->IsValueUpdate())
+		return;
 	
 	TIM3->CCR1 =
 		this->Throttle() < 1

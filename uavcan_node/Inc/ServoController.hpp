@@ -27,6 +27,8 @@ namespace Controllers
 		void ConfigureNode() override;
 	
 		bool GetValue(int32_t* value) override;
+		
+		inline void Output() override;
 
 	private:	
 		typedef uavcan::MethodBinder<ServoController*,

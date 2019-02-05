@@ -111,6 +111,21 @@ bool ServoController::GetValue(int32_t* value)
 	memcpy(value, this->value, this->deviceCount * sizeof(int32_t));
 	return true;
 }
+		
+void ServoController::Output()
+{	
+	static volatile uint32_t* outputChannels[3] = { &TIM3->CCR1, &TIM3->CCR2, &TIM3->CCR3 };
+	
+	int32_t value[this->deviceCount];
+	if (this->GetValue(value))
+		for (uint32_t i = 0; i < deviceCount; i++)
+			*outputChannels[i] = 
+				value[i] < 1
+					? 1500		// default value for actuators - middle position
+					: Controllers::deviceId == (uint32_t)ServoDevices::AileronLeft || Controllers::deviceId == (uint32_t)ServoDevices::AileronRight
+						? NumericConvertions::RangeTransform<1125, 1875, 1000, 2000>(value[i])		// ailerons
+						: NumericConvertions::RangeTransform<1000, 2000, 1100, 1900>(value[i]);  	// tail(rudder & elevator)
+}
 
 void ServoController::StatusCallback(const uavcan::TimerEvent& event)
 {

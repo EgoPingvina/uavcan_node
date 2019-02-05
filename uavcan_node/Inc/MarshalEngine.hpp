@@ -4,16 +4,18 @@
 
 namespace Controllers
 {
-	class MarshalEngine : private ServoController
+	class MarshalEngine : public ServoController
 	{
 	public:
 		MarshalEngine();
+		
+		void Initialize() override;
 		
 		int32_t Throttle();
 		
 		bool Ignition() const;
 		
-		void OnStep();
+		inline void Output() override;
 		
 	private:	
 		typedef uavcan::MethodBinder<MarshalEngine*,

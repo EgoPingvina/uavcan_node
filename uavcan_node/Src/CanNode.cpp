@@ -33,12 +33,6 @@ Node& CanNode::GetNode()
 	static Node mynode(this->GetCanDriver(), uavcan_stm32::SystemClock::instance());
 	return mynode;
 }
-
-void CanNode::NodeSpin() 
-{
-	if (this->GetNode().spin(uavcan::MonotonicDuration::fromMSec(100)) < 0)
-		this->ErrorHandler(__LINE__);
-}
 	
 unsigned CanNode::SelfIndex() const
 {
@@ -48,4 +42,17 @@ unsigned CanNode::SelfIndex() const
 bool CanNode::IsValueUpdate(void) const
 {		 
 	return this->isValueUpdate;
+}
+
+void CanNode::NodeSpin() 
+{
+	if (this->GetNode().spin(uavcan::MonotonicDuration::fromMSec(100)) < 0)
+		this->ErrorHandler(__LINE__);
+}
+
+void CanNode::OnStep()
+{
+	this->NodeSpin();
+	
+	this->Output();
 }

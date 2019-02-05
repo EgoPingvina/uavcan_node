@@ -153,7 +153,7 @@ static void MX_TIM3_Init(void)
 	htim3.Init.Period					= 
 #if CONTROLLER == CONTROLLER_ESC
 		2500
-#elif CONTROLLER == CONTROLLER_SERVO
+#elif CONTROLLER == CONTROLLER_SERVO || CONTROLLER == MARSHAL_ENGINE
 		20000
 #endif
 		;
@@ -261,6 +261,8 @@ int main(void)
 	Controllers::ESCController 
 #elif CONTROLLER == CONTROLLER_SERVO
 	Controllers::ServoController 
+#elif CONTROLLER == MARSHAL_ENGINE
+	Controllers::MarshalEngine
 #endif		
 		controller;
 	
@@ -279,44 +281,16 @@ int main(void)
 #if CONTROLLER == CONTROLLER_SERVO
 	static constexpr uint32_t deviceCount = NumericConvertions::UpBitsCount(Controllers::deviceId);
 	static_assert(deviceCount <= 3, "management of no more than three servos is allowed");
-	
-	volatile uint32_t* outputChannels[3] = { &TIM3->CCR1, &TIM3->CCR2, &TIM3->CCR3 };
 #endif
 	
 	uint32_t lastToggle = 0;
 	/* Infinite loop */
 	while (1)
 	{
-		controller.NodeSpin();
-
-#if CONTROLLER == CONTROLLER_ESC
-		int32_t value = 0;
-		if (controller.GetValue(&value))
-			TIM3->CCR2 = TIM3->CCR1 =
-				value < 1
-					? 900
-					: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);		
-#elif CONTROLLER == CONTROLLER_SERVO		
-		if (Controllers::deviceId == (uint32_t)ServoDevices::Throttle)
-		{
-			static Controllers::MarshalEngine engine;
-			engine.OnStep();
-		}
-		else
-		{
-			int32_t value[deviceCount];
-			if (controller.GetValue(value))
-				for (uint32_t i = 0; i < deviceCount; i++)
-					*outputChannels[i] = 
-						value[i] < 1
-							? 1500		// default value for actuators - middle position
-							: Controllers::deviceId == (uint32_t)ServoDevices::AileronLeft || Controllers::deviceId == (uint32_t)ServoDevices::AileronRight
-								? NumericConvertions::RangeTransform<1125, 1875, 1000, 2000>(value[i])		// ailerons
-								: NumericConvertions::RangeTransform<1000, 2000, 1100, 1900>(value[i]); 		// tail(rudder & elevator)
-		}
-#endif
+		controller.OnStep();
 		
 		// life indication
+		// ToDo should be a different task
 		if (HAL_GetTick() >= lastToggle + lifeIndicationPeriod)
 		{
 			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
