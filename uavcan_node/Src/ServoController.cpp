@@ -24,8 +24,8 @@ void ServoController::Initialize()
 	
 #pragma region Subscription initialize
 	
-	static uavcan::Subscriber<uavcan::equipment::actuator::ArrayCommand> rawSubscriber(this->GetNode());
-	isOk = rawSubscriber.start(
+	static uavcan::Subscriber<uavcan::equipment::actuator::ArrayCommand> arrayCommandSubscriber(this->GetNode());
+	isOk = arrayCommandSubscriber.start(
 		ArrayCommandCallbackBinder(
 			this,
 			&ServoController::ArrayCommandCallback));	
@@ -140,7 +140,8 @@ void ServoController::ArrayCommandCallback(const uavcan::ReceivedDataStructure<u
 
 	for (unsigned i = 0, position = 0; i < (unsigned)ServoDevices::Size; i++)
 		if (GetBit(deviceId, i) == 1)
-			this->value[position++] = msg.commands[i].command_value;
+			if (msg.commands[i].command_type == (uint8_t)Commands::PWM)
+				this->value[position++] = msg.commands[i].command_value;
 	
 	this->isValueUpdate = true;
 }

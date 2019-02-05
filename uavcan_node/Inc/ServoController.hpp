@@ -14,6 +14,12 @@ namespace Controllers
 	class ServoController : public CanNode
 	{
 	public:
+		enum class Commands : uint8_t
+		{
+			PWM			= 1,
+			Ignition	= 2
+		};
+		
 		ServoController();
 	
 		void Initialize() override;
