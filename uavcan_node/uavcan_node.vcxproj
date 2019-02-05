@@ -109,6 +109,7 @@
     <ClCompile Include="..\libuavcan\libuavcan_drivers\stm32\driver\src\uc_stm32_thread.cpp" />
     <ClCompile Include="config\config.cpp" />
     <ClCompile Include="Src\CanNode.cpp" />
+    <ClCompile Include="Src\MarshalEngine.cpp" />
     <ClCompile Include="Src\ServoController.cpp" />
     <ClCompile Include="Src\stm32f1xx_it.c" />
     <ClCompile Include="Src\stm32f1xx_hal_msp.c" />
@@ -137,7 +138,9 @@
     <ClInclude Include="Inc\ESCDevices.hpp" />
     <ClInclude Include="Inc\main.hpp" />
     <ClInclude Include="Inc\ESCController.hpp" />
+    <ClInclude Include="Inc\MarshalEngine.hpp" />
     <ClInclude Include="Inc\ServoController.hpp" />
+    <ClInclude Include="Inc\Singleton.hpp" />
     <None Include="stm32.props" />
     <ClCompile Include="$(BSP_ROOT)\STM32F1xxxx\StartupFiles\startup_stm32f103xe.c" />
     <ClInclude Include="Inc\NumericConvertions.hpp" />

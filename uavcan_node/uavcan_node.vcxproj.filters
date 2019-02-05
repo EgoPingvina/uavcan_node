@@ -359,6 +359,9 @@
     <ClCompile Include="Src\CanNode.cpp">
       <Filter>Source files\Controllers</Filter>
     </ClCompile>
+    <ClCompile Include="Src\MarshalEngine.cpp">
+      <Filter>Source files\Controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libuavcan\libuavcan\include\uavcan\build_config.hpp">
@@ -396,6 +399,12 @@
     </ClInclude>
     <ClInclude Include="Inc\CallbackT.h">
       <Filter>Header files\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Singleton.hpp">
+      <Filter>Header files\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\MarshalEngine.hpp">
+      <Filter>Header files\Controllers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -296,23 +296,24 @@ int main(void)
 				value < 1
 					? 900
 					: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);		
-#elif CONTROLLER == CONTROLLER_SERVO
-		int32_t value[deviceCount];
-		if (controller.GetValue(value))
+#elif CONTROLLER == CONTROLLER_SERVO		
+		if (Controllers::deviceId == (uint32_t)ServoDevices::Throttle)
 		{
-			for (uint32_t i = 0; i < deviceCount; i++)
-				*outputChannels[i] = 
-					value[i] < 1
-						? Controllers::deviceId == (uint32_t)ServoDevices::Throttle
-							? 950		// default value for main engine - idling
-							: 1500		// default value for actuators - middle position
-						: Controllers::deviceId == (uint32_t)ServoDevices::Throttle
-							? NumericConvertions::RangeTransform<1000, 2000, 1000, 1780>(value[i])			// throttle
+			static Controllers::MarshalEngine engine;
+			engine.OnStep();
+		}
+		else
+		{
+			int32_t value[deviceCount];
+			if (controller.GetValue(value))
+				for (uint32_t i = 0; i < deviceCount; i++)
+					*outputChannels[i] = 
+						value[i] < 1
+							? 1500		// default value for actuators - middle position
 							: Controllers::deviceId == (uint32_t)ServoDevices::AileronLeft || Controllers::deviceId == (uint32_t)ServoDevices::AileronRight
 								? NumericConvertions::RangeTransform<1125, 1875, 1000, 2000>(value[i])		// ailerons
-								: NumericConvertions::RangeTransform<1000, 2000, 1100, 1900>(value[i]);		// tail(rudder & elevator)
+								: NumericConvertions::RangeTransform<1000, 2000, 1100, 1900>(value[i]); 		// tail(rudder & elevator)
 		}
-			
 #endif
 		
 		// life indication

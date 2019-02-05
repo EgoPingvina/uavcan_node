@@ -76,6 +76,6 @@ namespace Controllers
 		/// <summary>
 		/// Callback of new ArrayCommand package
 		/// </summary>
-		void ArrayCommandCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::ArrayCommand>& msg);
+		void ArrayCommandCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::ArrayCommand>& message);
 	};
 }

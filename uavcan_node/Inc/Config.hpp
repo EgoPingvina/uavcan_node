@@ -27,6 +27,7 @@
 #elif CONTROLLER == CONTROLLER_SERVO
 	#include "ServoController.hpp"
 	#include "ServoDevices.hpp"
+	#include "MarshalEngine.hpp"
 #endif
 
 #pragma endregion

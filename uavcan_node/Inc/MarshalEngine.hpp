@@ -1,0 +1,44 @@
+#pragma once
+
+#include "ServoController.hpp"
+
+namespace Controllers
+{
+	class MarshalEngine : private ServoController
+	{
+	public:
+		MarshalEngine();
+		
+		int32_t Throttle();
+		
+		bool Ignition() const;
+		
+		void OnStep();
+		
+	private:	
+		typedef uavcan::MethodBinder<MarshalEngine*,
+			void(MarshalEngine::*)(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::Command>&)>
+			    IgnitionCallbackBinder;
+		
+		/// <summary>
+		/// default value for main engine - idling
+		/// </summary>
+		const int32_t defaultThrottle;
+	
+		/// <summary>
+		/// Callback of new ignition state value
+		/// </summary>
+		void IgnitionCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::Command>& message);
+
+		void MainLoop();
+
+		int32_t throttleValue;
+
+		bool ignitionValue;
+		
+		/// <summary>
+		/// if the engine has been stopped, it must remain stopped
+		/// </summary>
+		bool wasStopped;
+	};
+}

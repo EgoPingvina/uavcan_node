@@ -127,9 +127,9 @@ void ServoController::StatusCallback(const uavcan::TimerEvent& event)
 		this->ErrorHandler(__LINE__);
 }
 
-void ServoController::ArrayCommandCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::ArrayCommand>& msg)
+void ServoController::ArrayCommandCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::ArrayCommand>& message)
 {
-	if (msg.commands.size() < (unsigned)ServoDevices::Size)
+	if (message.commands.size() < (unsigned)ServoDevices::Size)
 	{
 		if (!this->isValueUpdate)
 			this->isValueUpdate = true;
@@ -140,8 +140,8 @@ void ServoController::ArrayCommandCallback(const uavcan::ReceivedDataStructure<u
 
 	for (unsigned i = 0, position = 0; i < (unsigned)ServoDevices::Size; i++)
 		if (GetBit(deviceId, i) == 1)
-			if (msg.commands[i].command_type == (uint8_t)Commands::PWM)
-				this->value[position++] = msg.commands[i].command_value;
+			if (message.commands[i].command_type == (uint8_t)Commands::PWM)
+				this->value[position++] = message.commands[i].command_value;
 	
 	this->isValueUpdate = true;
 }
