@@ -18,7 +18,7 @@ download from: https://github.com/PX4/windows-toolchain/releases
 
 run /PX4/run-console.bat
 
-go to libuavcan parent folder
+go to repo parent folder
 
 invoke 
 ```
