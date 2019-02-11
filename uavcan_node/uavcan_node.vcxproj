@@ -41,24 +41,24 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../dsdlc_g;../libuavcan/libuavcan/include;../libuavcan/libuavcan_drivers/stm32/driver/include;Drivers\CMSIS\Device\ST\STM32F1xx\Include;Drivers/CMSIS/Include;Inc;Drivers\STM32F1xx_HAL_Driver\Inc;Drivers\STM32F1xx_HAL_Driver\Inc\Legacy;Drivers\STM32F1xx_HAL_Driver\Src;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>flash_layout;STM32F103xE;DEBUG=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../dsdlc_g;../libuavcan/libuavcan/include;../libuavcan/libuavcan_drivers/stm32/driver/include;Drivers/CMSIS/Include;Inc;Drivers\CMSIS\Device\ST\STM32F1xx\Include;Drivers\STM32F1xx_HAL_Driver\Inc;Drivers\STM32F1xx_HAL_Driver\Inc\Legacy;Drivers\STM32F1xx_HAL_Driver\Src;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG=1;flash_layout;STM32F103xE;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions />
       <CLanguageStandard>C11</CLanguageStandard>
       <CPPLanguageStandard>GNUPP14</CPPLanguageStandard>
     </ClCompile>
     <Link>
-      <LibrarySearchDirectories>;%(Link.LibrarySearchDirectories)</LibrarySearchDirectories>
-      <AdditionalLibraryNames>;%(Link.AdditionalLibraryNames)</AdditionalLibraryNames>
-      <AdditionalLinkerInputs>;%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
+      <LibrarySearchDirectories>%(Link.LibrarySearchDirectories)</LibrarySearchDirectories>
+      <AdditionalLibraryNames>%(Link.AdditionalLibraryNames)</AdditionalLibraryNames>
+      <AdditionalLinkerInputs>%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
       <AdditionalOptions />
       <LinkerScript />
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Inc;Drivers\CMSIS\Device\ST\STM32F1xx\Include;Drivers\STM32F1xx_HAL_Driver\Inc;Drivers\STM32F1xx_HAL_Driver\Inc\Legacy;Drivers\STM32F1xx_HAL_Driver\Src;../dsdlc_g;../libuavcan/libuavcan/include;../libuavcan/libuavcan_drivers/stm32/driver/include;Drivers/CMSIS/Include;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>flash_layout;STM32F103xE;NDEBUG=1;RELEASE=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../dsdlc_g;../libuavcan/libuavcan/include;../libuavcan/libuavcan_drivers/stm32/driver/include;Drivers/CMSIS/Include;Inc;Drivers\CMSIS\Device\ST\STM32F1xx\Include;Drivers\STM32F1xx_HAL_Driver\Inc;Drivers\STM32F1xx_HAL_Driver\Inc\Legacy;Drivers\STM32F1xx_HAL_Driver\Src;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG=1;RELEASE=1;flash_layout;STM32F103xE;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions />
       <CLanguageStandard />
       <CPPLanguageStandard />

@@ -2,6 +2,8 @@
 
 #include "ServoController.hpp"
 
+#include <uavcan/equipment/actuator/Command.hpp>
+
 namespace Controllers
 {
 	class MarshalEngine : public ServoController

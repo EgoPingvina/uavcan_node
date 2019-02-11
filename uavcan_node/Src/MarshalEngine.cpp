@@ -23,6 +23,10 @@ void MarshalEngine::Initialize()
 		&MarshalEngine::IgnitionCallback));	
 	if (isOk < 0)
 		this->ErrorHandler(__LINE__);
+	
+	isOk = uavcan::GlobalDataTypeRegistry::instance().registerDataType<uavcan::equipment::actuator::Command>(1012);
+	if (isOk != uavcan::GlobalDataTypeRegistry::RegistrationResultOk)
+		this->ErrorHandler(__LINE__);
 }
 
 int32_t MarshalEngine::Throttle()

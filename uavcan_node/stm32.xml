@@ -45,7 +45,7 @@
     <AllDependencies>
       <ProjectDependency>
         <RelativePath>uavcan_node.gpdsc</RelativePath>
-        <Timestamp>131925449957620665</Timestamp>
+        <Timestamp>131940283388453054</Timestamp>
       </ProjectDependency>
     </AllDependencies>
     <RootDirectory>
