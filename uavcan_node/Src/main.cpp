@@ -73,7 +73,7 @@ void SystemClock_Config(void)
 	*/
 	RCC_OscInitStruct.OscillatorType		= RCC_OSCILLATORTYPE_HSI;
 	RCC_OscInitStruct.HSIState				= RCC_HSI_ON;
-	RCC_OscInitStruct.HSICalibrationValue	= 16; // ToDo пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ RCC_HSICALIBRATION_DEFAULT
+	RCC_OscInitStruct.HSICalibrationValue	= 16; // ToDo разобраться, почему не RCC_HSICALIBRATION_DEFAULT
 	RCC_OscInitStruct.PLL.PLLState			= RCC_PLL_ON;
 	RCC_OscInitStruct.PLL.PLLSource			= RCC_PLLSOURCE_HSI_DIV2;
 	RCC_OscInitStruct.PLL.PLLMUL			= RCC_PLL_MUL16;
@@ -128,7 +128,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
 		GPIO_InitStruct.Mode			= GPIO_MODE_AF_PP;
 		GPIO_InitStruct.Speed			= GPIO_SPEED_FREQ_LOW;
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
+		
 		/* TIM3 GPIO Configuration
 		 * PA7     ------> TIM3_CH2
 		 */
@@ -136,6 +136,16 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
 		GPIO_InitStruct.Mode			= GPIO_MODE_AF_PP;
 		GPIO_InitStruct.Speed			= GPIO_SPEED_FREQ_LOW;
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+				
+#if CONTROLLER != MARSHAL_ENGINE
+		/* TIM3 GPIO Configuration
+		 * PB0     ------> TIM3_CH3
+		 */
+		GPIO_InitStruct.Pin				= GPIO_PIN_0;
+		GPIO_InitStruct.Mode			= GPIO_MODE_AF_PP;
+		GPIO_InitStruct.Speed			= GPIO_SPEED_FREQ_LOW;
+		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+#endif
 	}
 }
 
@@ -144,8 +154,8 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
 /// </summary>
 static void MX_TIM3_Init(void)
 {
-	TIM_MasterConfigTypeDef sMasterConfig = { 0 };
-	TIM_OC_InitTypeDef sConfigOC = { 0 };
+	TIM_MasterConfigTypeDef sMasterConfig	= { 0 };
+	TIM_OC_InitTypeDef sConfigOC			= { 0 };
 	
 	htim3.Instance						= TIM3;
 	htim3.Init.Prescaler				= 63;
@@ -180,8 +190,10 @@ static void MX_TIM3_Init(void)
 	if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
 		Error_Handler();
 	
+#if CONTROLLER != MARSHAL_ENGINE
 	if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
 		Error_Handler();
+#endif
 	
 	HAL_TIM_MspPostInit(&htim3);
 }
@@ -209,7 +221,7 @@ static void MX_USART2_UART_Init(void)
 /// </summary>
 static void MX_GPIO_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+	GPIO_InitTypeDef GPIO_InitStruct	= { 0 };
 	
 	/* GPIO Ports Clock Enable */
 	__HAL_RCC_GPIOA_CLK_ENABLE();
@@ -224,6 +236,18 @@ static void MX_GPIO_Init(void)
 	GPIO_InitStruct.Pull				= GPIO_NOPULL;
 	GPIO_InitStruct.Speed				= GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+		
+#if CONTROLLER == MARSHAL_ENGINE
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+	
+	/*Configure GPIO pin : PA4 */
+	GPIO_InitStruct.Pin					= GPIO_PIN_0;
+	GPIO_InitStruct.Mode				= GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull				= GPIO_NOPULL;
+	GPIO_InitStruct.Speed				= GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+#endif
 }
 
 #ifdef  USE_FULL_ASSERT
@@ -273,7 +297,9 @@ int main(void)
 	
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+#if CONTROLLER != MARSHAL_ENGINE
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+#endif
 	
 	// wait of uavcan server initialization(pixhawk)
 	HAL_Delay(startDelayMs);

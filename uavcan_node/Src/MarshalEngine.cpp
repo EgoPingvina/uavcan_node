@@ -50,7 +50,7 @@ void MarshalEngine::Output()
 	HAL_GPIO_WritePin(
 		GPIOB,
 		GPIO_PIN_0,
-		this->ignitionValue ? GPIO_PIN_RESET : GPIO_PIN_SET);	// key logic is inverted
+		this->Ignition() ? GPIO_PIN_RESET : GPIO_PIN_SET);	// key logic is inverted
 }
 
 void MarshalEngine::IgnitionCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::Command>& message)

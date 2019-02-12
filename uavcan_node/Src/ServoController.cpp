@@ -19,7 +19,7 @@ ServoController::ServoController()
 void ServoController::Initialize()
 {
 	this->ConfigureNode();
-
+	
 	int32_t isOk = 0;
 	
 #pragma region Subscription initialize
@@ -31,11 +31,11 @@ void ServoController::Initialize()
 			&ServoController::ArrayCommandCallback));	
 	if (isOk < 0)
 		this->ErrorHandler(__LINE__);
-
+	
 #pragma endregion
-
+	
 #pragma region Publications initialize
-
+	
 	static uavcan::Timer statusSender(this->GetNode());
 	
 	this->statusPublisher = new uavcan::Publisher<uavcan::equipment::actuator::Status>(this->GetNode());
@@ -49,19 +49,19 @@ void ServoController::Initialize()
 			&ServoController::StatusCallback));
 	
 	statusSender.startPeriodic(uavcan::MonotonicDuration::fromMSec(100));   	// 10Hz
-
+	
 #pragma endregion
 }
 
 void ServoController::ConfigureNode()
 {
 	auto& mynode = this->GetNode();
-
+	
 	if (!mynode.setNodeID(nodeId))
 		this->ErrorHandler(__LINE__);
-
+	
 	mynode.setName(NODE_NAME);
-
+	
 	uavcan::protocol::SoftwareVersion sw_version;   // Standard type uavcan.protocol.SoftwareVersion
 	sw_version.major		= 2;
 	sw_version.minor		= 0;
@@ -69,7 +69,7 @@ void ServoController::ConfigureNode()
 	sw_version.image_crc	= 0x0102030405060708;  // image CRC-64-WE see https://uavcan.org/Specification/7._List_of_standard_data_types/ 
 	sw_version.optional_field_flags |= sw_version.OPTIONAL_FIELD_FLAG_VCS_COMMIT;
 	mynode.setSoftwareVersion(sw_version);
-
+	
 	uavcan::protocol::HardwareVersion hw_version;   // Standard type uavcan.protocol.HardwareVersion
 	hw_version.major		= 1;
 	hw_version.minor		= 0;
@@ -82,24 +82,24 @@ void ServoController::ConfigureNode()
 	 */
 	if (uavcan::GlobalDataTypeRegistry::instance().registerDataType<uavcan::equipment::actuator::Command>(1012) != uavcan::GlobalDataTypeRegistry::RegistrationResultOk)
 		this->ErrorHandler(__LINE__);
-
+	
 	/*
 	* Start the node.
 	* All returnable error codes are listed in the header file uavcan/error.hpp.
 	*/
 	if (mynode.start() < 0)		
 		this->ErrorHandler(__LINE__);
-
+	
 	mynode.setRestartRequestHandler(&restart_request_handler);
-
+	
 	mynode.setModeOperational();
-
+	
 #pragma region Config
-
+	
 	static os::stm32::ConfigStorageBackend config_storage_backend(configStorageAddress, configStorageSize);
 	if (os::config::init(&config_storage_backend) < 0)
 		this->ErrorHandler(__LINE__);
-
+	
 	this->selfIndex = this->paramActuatorId.get();
 	this->position	= this->paramPosition.get();
 	this->force		= this->paramForce.get();
@@ -136,14 +136,14 @@ void ServoController::Output()
 void ServoController::StatusCallback(const uavcan::TimerEvent& event)
 {
 	uavcan::equipment::actuator::Status message;
-
+	
 	// ToDo send real data
 	message.actuator_id			= this->selfIndex;
 	message.force				= this->force; 
 	message.position			= this->position;
 	message.speed				= this->speed; 
 	message.power_rating_pct	= 0.0F;
-
+	
 	if (this->statusPublisher->broadcast(message) < 0)
 		this->ErrorHandler(__LINE__);
 }
@@ -154,11 +154,11 @@ void ServoController::ArrayCommandCallback(const uavcan::ReceivedDataStructure<u
 	{
 		if (!this->isValueUpdate)
 			this->isValueUpdate = true;
-
+		
 		this->value = 0;
 		return;
 	}
-
+	
 	for (unsigned i = 0, position = 0; i < (unsigned)ServoDevices::Size; i++)
 		if (GetBit(deviceId, i) == 1)
 			if (message.commands[i].command_type == (uint8_t)Commands::PWM)
