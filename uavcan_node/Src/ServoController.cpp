@@ -76,6 +76,12 @@ void ServoController::ConfigureNode()
 	const auto uid			= this->ReadUID();
 	std::copy(std::begin(uid), std::end(uid), std::begin(hw_version.unique_id));
 	mynode.setHardwareVersion(hw_version);
+	
+	/*
+	 * Set for uavcan::equipment::actuator::Command custom ID 1012
+	 */
+	if (uavcan::GlobalDataTypeRegistry::instance().registerDataType<uavcan::equipment::actuator::Command>(1012) != uavcan::GlobalDataTypeRegistry::RegistrationResultOk)
+		this->ErrorHandler(__LINE__);
 
 	/*
 	* Start the node.

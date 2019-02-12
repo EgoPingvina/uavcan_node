@@ -72,7 +72,7 @@ void SystemClock_Config(void)
 	*/
 	RCC_OscInitStruct.OscillatorType		= RCC_OSCILLATORTYPE_HSI;
 	RCC_OscInitStruct.HSIState				= RCC_HSI_ON;
-	RCC_OscInitStruct.HSICalibrationValue	= 16; // ToDo разобраться, почему не RCC_HSICALIBRATION_DEFAULT
+	RCC_OscInitStruct.HSICalibrationValue	= 16; // ToDo пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ RCC_HSICALIBRATION_DEFAULT
 	RCC_OscInitStruct.PLL.PLLState			= RCC_PLL_ON;
 	RCC_OscInitStruct.PLL.PLLSource			= RCC_PLLSOURCE_HSI_DIV2;
 	RCC_OscInitStruct.PLL.PLLMUL			= RCC_PLL_MUL16;
@@ -266,16 +266,16 @@ int main(void)
 #endif		
 		controller;
 	
-	controller.Initialize();
-	
 	// attach error handler
 	controller.SetErrorHandler(NodeErrorHandler);
-
+	
+	controller.Initialize();
+	
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
 	
-	// wait of uavcan server initialization(paxhawk)
+	// wait of uavcan server initialization(pixhawk)
 	HAL_Delay(startDelayMs);
 	
 #if CONTROLLER == CONTROLLER_SERVO
