@@ -20,7 +20,7 @@ namespace Controllers
 	/// Memory pool size largely depends on the number of CAN ifaces and on application's logic.
 	/// Please read the documentation for the class uavcan::Node to learn more.
 	/// </summary>
-	static constexpr unsigned nodeMemoryPoolSize = 16384;     // 4KB - 512KB
+	static constexpr unsigned nodeMemoryPoolSize	= 16384;     // 4KB - 512KB
 	
 	typedef uavcan::Node<nodeMemoryPoolSize> Node;
 	
@@ -82,9 +82,9 @@ namespace Controllers
 		
 	private :
 
-		static constexpr int32_t rxQueueSize			= 64;
+		static constexpr int32_t rxQueueSize		= 64;
 
-		static constexpr uint32_t bitRate				= 1000000;
+		static constexpr uint32_t bitRate			= 1000000;
 		
 		Action<int32_t> errorHandler;
 		
@@ -97,4 +97,4 @@ namespace Controllers
 	};	
 }
 
-#endif // !CANNODE
+#endif

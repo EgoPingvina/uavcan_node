@@ -51,7 +51,8 @@ static void NodeErrorHandler(int32_t line)
 				tickNumber = tickNumber == 4 ? tickNumber + 1 : 0;
 			}
 		}
-		else if (HAL_GetTick() >= lastToggle + shortTick)
+		else
+			if (HAL_GetTick() >= lastToggle + shortTick)
 			{
 				HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
 				lastToggle = HAL_GetTick();
@@ -109,7 +110,7 @@ static void MX_CAN_Init(void)
 	hcan.Init.AutoRetransmission		= DISABLE;
 	hcan.Init.ReceiveFifoLocked			= DISABLE;
 	hcan.Init.TransmitFifoPriority		= DISABLE;
-	  
+	
 	if (HAL_CAN_Init(&hcan) != HAL_OK)
 		Error_Handler();
 }
@@ -117,10 +118,9 @@ static void MX_CAN_Init(void)
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
 {
 	GPIO_InitTypeDef GPIO_InitStruct;
-
+	
 	if (htim->Instance == TIM3)
-	{
-
+	{		
 		/* TIM3 GPIO Configuration
 		 * PA6     ------> TIM3_CH1
 		 */
@@ -159,30 +159,30 @@ static void MX_TIM3_Init(void)
 		;
 	htim3.Init.ClockDivision			= TIM_CLOCKDIVISION_DIV1;
 	htim3.Init.AutoReloadPreload		= TIM_AUTORELOAD_PRELOAD_DISABLE;
-	  
+	
 	if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
 		Error_Handler();
-	  
+	
 	sMasterConfig.MasterOutputTrigger	= TIM_TRGO_RESET;
 	sMasterConfig.MasterSlaveMode		= TIM_MASTERSLAVEMODE_DISABLE;
-	  
+	
 	if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
 		Error_Handler();
-	  
+	
 	sConfigOC.OCMode					= TIM_OCMODE_PWM1;
 	sConfigOC.Pulse						= 0;
 	sConfigOC.OCPolarity				= TIM_OCPOLARITY_HIGH;
 	sConfigOC.OCFastMode				= TIM_OCFAST_DISABLE;
-	  
+	
 	if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
 		Error_Handler();
-
+	
 	if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
 		Error_Handler();
-
+	
 	if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
 		Error_Handler();
-	    
+	
 	HAL_TIM_MspPostInit(&htim3);
 }
 
@@ -199,7 +199,7 @@ static void MX_USART2_UART_Init(void)
 	huart2.Init.Mode					= UART_MODE_TX_RX;
 	huart2.Init.HwFlowCtl				= UART_HWCONTROL_NONE;
 	huart2.Init.OverSampling			= UART_OVERSAMPLING_16;
-		
+	
 	if (HAL_UART_Init(&huart2) != HAL_OK)
 		Error_Handler();
 }
@@ -210,14 +210,14 @@ static void MX_USART2_UART_Init(void)
 static void MX_GPIO_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-
+	
 	/* GPIO Ports Clock Enable */
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
-
+	
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-
+	
 	/*Configure GPIO pin : PA4 */
 	GPIO_InitStruct.Pin					= GPIO_PIN_4;
 	GPIO_InitStruct.Mode				= GPIO_MODE_OUTPUT_PP;
