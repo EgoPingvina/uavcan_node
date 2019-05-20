@@ -309,11 +309,18 @@ int main(void)
 	static_assert(deviceCount <= 3, "management of no more than three servos is allowed");
 #endif
 	
-	uint32_t lastToggle = 0;
+	uint32_t lastToggle = 0, tmp=0;
+	int32_t sign = 1;
 	/* Infinite loop */
 	while (1)
 	{
-		controller.OnStep();
+		//controller.OnStep();
+		TIM3->CCR1 = tmp;
+		TIM3->CCR2 = tmp;
+		TIM3->CCR3 = tmp;
+		tmp += sign * 5;
+		if (tmp >= 2000 || tmp <= 0)
+			sign *= -1;
 		
 		// life indication
 		// ToDo should be a different task

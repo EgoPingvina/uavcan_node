@@ -18,7 +18,7 @@
 /// <summary>
 /// Current node firmware
 /// </summary>
-#define CONTROLLER			MARSHAL_ENGINE	// Manually changeable
+#define CONTROLLER			CONTROLLER_SERVO	// Manually changeable
 
 #pragma region Including of specified controller
 
@@ -49,7 +49,7 @@ namespace Controllers
 	#elif CONTROLLER == CONTROLLER_SERVO
 			ServoDevices::
 	#endif
-				AileronLeft;             	// Manually changeable
+				Tail;             	// Manually changeable
 #endif
 
 	/// <summary>
