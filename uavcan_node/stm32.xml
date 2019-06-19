@@ -7,7 +7,7 @@
     <Revision>3</Revision>
   </ToolchainVersion>
   <BspID>com.sysprogs.arm.stm32</BspID>
-  <BspVersion>2018.12</BspVersion>
+  <BspVersion>2018.12R2</BspVersion>
   <McuID>STM32F103RE</McuID>
   <MCUDefinitionFile>STM32F1xxxx/DeviceDefinitions/stm32f103xe.xml</MCUDefinitionFile>
   <MCUProperties>
@@ -45,7 +45,7 @@
     <AllDependencies>
       <ProjectDependency>
         <RelativePath>uavcan_node.gpdsc</RelativePath>
-        <Timestamp>131940283388453054</Timestamp>
+        <Timestamp>131961719132222315</Timestamp>
       </ProjectDependency>
     </AllDependencies>
     <RootDirectory>
