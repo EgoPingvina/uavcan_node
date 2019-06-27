@@ -119,7 +119,7 @@ void ESCController::Output()
 		TIM3->CCR2 = TIM3->CCR1 =
 			value < 1
 				? 900
-				: NumericConvertions::RangeTransform<1, 8191, 1075, 1950>(value);
+				: NumericConvertions::RangeTransform<1, 8191, 1100, 1900>(value);
 }
 
 void ESCController::StatusCallback(const uavcan::TimerEvent& event)
