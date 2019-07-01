@@ -18,7 +18,7 @@
 /// <summary>
 /// Current node firmware
 /// </summary>
-#define CONTROLLER			CONTROLLER_ESC	// Manually changeable
+#define CONTROLLER			MARSHAL_ENGINE	// Manually changeable
 
 #pragma region Including of specified controller
 

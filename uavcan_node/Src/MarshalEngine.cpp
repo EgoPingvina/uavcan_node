@@ -4,7 +4,7 @@ using namespace Controllers;
 
 MarshalEngine::MarshalEngine()
 	: ServoController()
-	, defaultThrottle(950)
+	, defaultThrottle(920)
 	, throttleValue(defaultThrottle)
 	, ignitionValue(false)
 	, wasStopped(false)
@@ -45,7 +45,7 @@ void MarshalEngine::Output()
 	TIM3->CCR1 =
 		this->Throttle() < 1
 			? defaultThrottle
-			: NumericConvertions::RangeTransform<1000, 2000, 1000, 1780>(this->throttleValue);
+			: NumericConvertions::RangeTransform<1000, 2000, 900, 1500>(this->throttleValue);
 	
 	HAL_GPIO_WritePin(
 		GPIOB,
