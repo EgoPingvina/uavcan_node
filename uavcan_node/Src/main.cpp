@@ -1,4 +1,4 @@
-#include "main.hpp"
+п»ї#include "main.hpp"
 #include "NumericConvertions.hpp"
 #include "Config.hpp"
 
@@ -73,7 +73,7 @@ void SystemClock_Config(void)
 	*/
 	RCC_OscInitStruct.OscillatorType		= RCC_OSCILLATORTYPE_HSI;
 	RCC_OscInitStruct.HSIState				= RCC_HSI_ON;
-	RCC_OscInitStruct.HSICalibrationValue	= 16; // ToDo разобраться, почему не RCC_HSICALIBRATION_DEFAULT
+	RCC_OscInitStruct.HSICalibrationValue	= 16; // ToDo СЂР°Р·РѕР±СЂР°С‚СЊСЃСЏ, РїРѕС‡РµРјСѓ РЅРµ RCC_HSICALIBRATION_DEFAULT
 	RCC_OscInitStruct.PLL.PLLState			= RCC_PLL_ON;
 	RCC_OscInitStruct.PLL.PLLSource			= RCC_PLLSOURCE_HSI_DIV2;
 	RCC_OscInitStruct.PLL.PLLMUL			= RCC_PLL_MUL16;
@@ -309,8 +309,9 @@ int main(void)
 	static_assert(deviceCount <= 3, "management of no more than three servos is allowed");
 #endif
 	
-	uint32_t lastToggle = 0, tmp=0;
-	int32_t sign = 1;
+	float tmp			= 900;
+	uint32_t lastToggle = 0;
+	int32_t sign		= 1;
 	/* Infinite loop */
 	while (1)
 	{
@@ -318,7 +319,7 @@ int main(void)
 		TIM3->CCR1 = tmp;
 		TIM3->CCR2 = tmp;
 		TIM3->CCR3 = tmp;
-		tmp += sign * 5;
+		tmp += sign * 0.01;
 		if (tmp >= 2000 || tmp <= 0)
 			sign *= -1;
 		
