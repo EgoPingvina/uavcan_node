@@ -34,8 +34,6 @@ namespace Controllers
 		/// </summary>
 		void IgnitionCallback(const uavcan::ReceivedDataStructure<uavcan::equipment::actuator::Command>& message);
 
-		void MainLoop();
-
 		int32_t throttleValue;
 
 		bool ignitionValue;

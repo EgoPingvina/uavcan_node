@@ -5,6 +5,7 @@
 #define CONTROLLER_ESC		0
 #define CONTROLLER_SERVO	1
 #define MARSHAL_ENGINE		2
+#define TAIL_WITH_PREFLIGHT	3
 
 #pragma endregion
 
@@ -18,7 +19,7 @@
 /// <summary>
 /// Current node firmware
 /// </summary>
-#define CONTROLLER			MARSHAL_ENGINE	// Manually changeable
+#define CONTROLLER			TAIL_WITH_PREFLIGHT	// Manually changeable
 
 #pragma region Including of specified controller
 
@@ -31,6 +32,9 @@
 #elif CONTROLLER == MARSHAL_ENGINE
 	#include "ServoDevices.hpp"
 	#include "MarshalEngine.hpp"
+#elif CONTROLLER == TAIL_WITH_PREFLIGHT
+	#include "ServoDevices.hpp"
+	#include "TailWithPreflight.hpp"
 #endif
 
 #pragma endregion
@@ -40,16 +44,18 @@ namespace Controllers
 	/// <summary>
 	/// Current device id
 	/// </summary>
-	const uint32_t deviceId	= (uint32_t)
+	const uint32_t deviceId = (uint32_t)
 #if CONTROLLER == MARSHAL_ENGINE
 		ServoDevices::Throttle;
+#elif CONTROLLER == TAIL_WITH_PREFLIGHT
+		ServoDevices::Tail;
 #else
 	#if CONTROLLER == CONTROLLER_ESC
 			ESCDevices::
 	#elif CONTROLLER == CONTROLLER_SERVO
 			ServoDevices::
 	#endif
-				RightBottom;                               	// Manually changeable
+				Tail;                               	// Manually changeable
 #endif
 
 	/// <summary>

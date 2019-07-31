@@ -362,6 +362,9 @@
     <ClCompile Include="Src\MarshalEngine.cpp">
       <Filter>Source files\Controllers</Filter>
     </ClCompile>
+    <ClCompile Include="TailWithPreflight.cpp">
+      <Filter>Source files\Controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libuavcan\libuavcan\include\uavcan\build_config.hpp">
@@ -404,6 +407,9 @@
       <Filter>Header files\Helpers</Filter>
     </ClInclude>
     <ClInclude Include="Inc\MarshalEngine.hpp">
+      <Filter>Header files\Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="TailWithPreflight.hpp">
       <Filter>Header files\Controllers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -137,7 +137,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
 		GPIO_InitStruct.Speed			= GPIO_SPEED_FREQ_LOW;
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 				
-#if CONTROLLER != MARSHAL_ENGINE
+#if CONTROLLER != MARSHAL_ENGINE && CONTROLLER != TAIL_WITH_PREFLIGHT
 		/* TIM3 GPIO Configuration
 		 * PB0     ------> TIM3_CH3
 		 */
@@ -163,7 +163,7 @@ static void MX_TIM3_Init(void)
 	htim3.Init.Period					= 
 #if CONTROLLER == CONTROLLER_ESC
 		2500
-#elif CONTROLLER == CONTROLLER_SERVO || CONTROLLER == MARSHAL_ENGINE
+#elif CONTROLLER == CONTROLLER_SERVO || CONTROLLER == MARSHAL_ENGINE || CONTROLLER == TAIL_WITH_PREFLIGHT
 		20000
 #endif
 		;
@@ -190,7 +190,7 @@ static void MX_TIM3_Init(void)
 	if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
 		Error_Handler();
 	
-#if CONTROLLER != MARSHAL_ENGINE
+#if CONTROLLER != MARSHAL_ENGINE && CONTROLLER != TAIL_WITH_PREFLIGHT
 	if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
 		Error_Handler();
 #endif
@@ -241,12 +241,23 @@ static void MX_GPIO_Init(void)
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
 	
-	/*Configure GPIO pin : PA4 */
+	/*Configure GPIO pin : PB0 */
 	GPIO_InitStruct.Pin					= GPIO_PIN_0;
 	GPIO_InitStruct.Mode				= GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull				= GPIO_NOPULL;
 	GPIO_InitStruct.Speed				= GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+#elif CONTROLLER == TAIL_WITH_PREFLIGHT
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin : PB0 */
+	GPIO_InitStruct.Pin					= GPIO_PIN_0;
+	GPIO_InitStruct.Mode				= GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull				= GPIO_PULLUP;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 #endif
 }
 
@@ -287,6 +298,8 @@ int main(void)
 	Controllers::ServoController 
 #elif CONTROLLER == MARSHAL_ENGINE
 	Controllers::MarshalEngine
+#elif CONTROLLER == TAIL_WITH_PREFLIGHT
+	Controllers::TailWithPreflight
 #endif		
 		controller;
 	
