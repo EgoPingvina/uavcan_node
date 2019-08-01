@@ -39,17 +39,20 @@ void TailWithPreflight::Output()
 	ServoController::Output();
 
 	// current state of physical button
-	bool currentState			= HAL_GPIO_ReadPin(this->port, this->pin) == GPIO_PIN_RESET;
+	bool currentState			= HAL_GPIO_ReadPin(this->port, this->pin) == GPIO_PIN_RESET;	// true when pressed
 
 	// if button's physical and logical states are different
-	if (currentState != this->isPreflightOn)
+	if(currentState != this->previousState)
 	{
 		// take tick of this moment
 		uint32_t tick			= HAL_GetTick();
 		// if the button maintains its physical state for this->pressTime ms - change its logical state
 		if (tick - this->lastTick >= this->pressTime)
 		{
-			this->isPreflightOn	= currentState;
+			if (currentState && !this->previousState)
+				this->isPreflightOn = !this->isPreflightOn;
+			
+			this->previousState	= currentState;
 			this->lastTick		= tick;
 		}
 	}

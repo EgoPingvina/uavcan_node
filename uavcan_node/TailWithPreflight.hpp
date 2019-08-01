@@ -31,7 +31,19 @@ namespace Controllers
 
 		uavcan::Publisher<uavcan::equipment::big_one::Preflight_state>* preflightStatePublisher;
 
+		/// <summary>
+		/// Preflight state (safity switch)
+		/// </summary>
 		bool isPreflightOn = false;
+		
+		/// <summary>
+		/// Previous state of preflight button
+		/// </summary>
+		bool previousState = false;
+		
+		/// <summary>
+		/// Last tick  of preflight button state change
+		/// </summary>
 		uint32_t lastTick;
 
 		/// <summary>
